@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">CEIT Management</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">CEIT Management</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="hint_username">Admin Username</string>
+    <string name="hint_password">Admin Password</string>
+    <string name="btn_login">Login</string>
+    <string name="text_class">Class</string>
+    <string name="text_students">Students</string>
+    <string name="text_teachers">Teachers</string>
+    <string name="text_parents">Parents</string>
+    <string name="hint_search_teacher">Search teacher</string>
+    <string name="placeholder_item_teacher_name">Teacher Name</string>
+    <string name="placeholder_teacher_position">Teacher Position</string>
+    <string name="placeholder_teacher_rank">Teacher Rank</string>
+</resources>

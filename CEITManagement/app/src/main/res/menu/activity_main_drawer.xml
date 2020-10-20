@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/dashboard"
+            android:iconTint="@color/themeColor"
+            android:title="Dashboard" />
+        <item
+            android:id="@+id/nav_teachers"
+            android:icon="@drawable/teacher"
+            android:iconTint="@color/themeColor"
+            android:title="Teachers" />
+        <item
+            android:id="@+id/nav_class"
+            android:icon="@drawable/ic_dictionary"
+            android:iconTint="@color/themeColor"
+            android:title="Class"/>
+        <item
+            android:id="@+id/nav_students"
+            android:icon="@drawable/student"
+            android:iconTint="@color/themeColor"
+            android:title="Students"/>
+        <item
+            android:id="@+id/nav_parents"
+            android:icon="@drawable/parents"
+            android:iconTint="@color/themeColor"
+            android:title="Parents"/>
+
+    </group>
+    <group
+        android:menuCategory="container"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/admin_settings"
+            android:iconTint="@color/themeColor"
+            android:title="Admin Settings"/>
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/logout"
+            android:iconTint="@color/themeColor"
+            android:title="Logout"/>
+    </group>
+</menu>
