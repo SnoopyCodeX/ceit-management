@@ -30,6 +30,7 @@ public final class DialogUtil
 
         swal = new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
                 .setTitleText(title)
+                .showCancelButton(false)
                 .setContentText(message);
         swal.show();
     }
@@ -45,6 +46,7 @@ public final class DialogUtil
 
         swal = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
                     .setTitleText(title)
+                    .showCancelButton(false)
                     .setContentText(message);
         swal.show();
     }
@@ -60,6 +62,7 @@ public final class DialogUtil
 
         swal = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(title)
+                .showCancelButton(false)
                 .setContentText(message);
         swal.show();
     }
@@ -75,6 +78,7 @@ public final class DialogUtil
 
         swal = new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
                 .setTitleText(title)
+                .showCancelButton(false)
                 .setContentText(message);
         swal.setCancelable(cancelable);
         swal.setCanceledOnTouchOutside(cancelable);
@@ -92,6 +96,7 @@ public final class DialogUtil
 
         swal = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
                 .setTitleText(title)
+                .showCancelButton(false)
                 .setContentText(message);
         swal.setCancelable(cancelable);
         swal.setCanceledOnTouchOutside(cancelable);
@@ -109,6 +114,8 @@ public final class DialogUtil
 
         swal = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(title)
+                .showCancelButton(false)
+                .setConfirmText("")
                 .setContentText(message);
         swal.setCancelable(cancelable);
         swal.setCanceledOnTouchOutside(cancelable);
@@ -241,6 +248,126 @@ public final class DialogUtil
         swal.setCancelable(cancelable);
 
         swal.getProgressHelper().setBarColor(progressColor);
+        swal.show();
+    }
+
+    public static final void successDialog(Context context, String title, String message, String confirm, String cancel, SweetAlertDialog.OnSweetClickListener confirmClick, SweetAlertDialog.OnSweetClickListener cancelClick, boolean cancelable)
+    {
+        if(swal != null)
+        {
+            if(swal.isShowing())
+                swal.dismissWithAnimation();
+            swal = null;
+        }
+
+        swal = new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
+                .setTitleText(title)
+                .setContentText(message)
+                .setConfirmText(confirm)
+                .setCancelText(cancel)
+                .setCancelClickListener(cancelClick)
+                .setConfirmClickListener(confirmClick);
+        swal.setCanceledOnTouchOutside(cancelable);
+        swal.setCancelable(cancelable);
+        swal.show();
+    }
+
+    public static final void errorDialog(Context context, String title, String message, String confirm, String cancel, SweetAlertDialog.OnSweetClickListener confirmClick, SweetAlertDialog.OnSweetClickListener cancelClick, boolean cancelable)
+    {
+        if(swal != null)
+        {
+            if(swal.isShowing())
+                swal.dismissWithAnimation();
+            swal = null;
+        }
+
+        swal = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText(title)
+                .setContentText(message)
+                .setConfirmText(confirm)
+                .setCancelText(cancel)
+                .setCancelClickListener(cancelClick)
+                .setConfirmClickListener(confirmClick);
+        swal.setCanceledOnTouchOutside(cancelable);
+        swal.setCancelable(cancelable);
+        swal.show();
+    }
+
+    public static final void warningDialog(Context context, String title, String message, String confirm, String cancel, SweetAlertDialog.OnSweetClickListener confirmClick, SweetAlertDialog.OnSweetClickListener cancelClick, boolean cancelable)
+    {
+        if(swal != null)
+        {
+            if(swal.isShowing())
+                swal.dismissWithAnimation();
+            swal = null;
+        }
+
+        swal = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText(title)
+                .setContentText(message)
+                .setConfirmText(confirm)
+                .setCancelText(cancel)
+                .setCancelClickListener(cancelClick)
+                .setConfirmClickListener(confirmClick);
+        swal.setCanceledOnTouchOutside(cancelable);
+        swal.setCancelable(cancelable);
+        swal.show();
+    }
+
+    public static final void successDialog(Context context, String title, String message, String confirm, SweetAlertDialog.OnSweetClickListener confirmClick, boolean cancelable)
+    {
+        if(swal != null)
+        {
+            if(swal.isShowing())
+                swal.dismissWithAnimation();
+            swal = null;
+        }
+
+        swal = new SweetAlertDialog(context, SweetAlertDialog.SUCCESS_TYPE)
+                .setTitleText(title)
+                .setContentText(message)
+                .setConfirmText(confirm)
+                .setConfirmClickListener(confirmClick);
+        swal.setCanceledOnTouchOutside(cancelable);
+        swal.setCancelable(cancelable);
+        swal.show();
+    }
+
+    public static final void errorDialog(Context context, String title, String message, String confirm, SweetAlertDialog.OnSweetClickListener confirmClick, boolean cancelable)
+    {
+        if(swal != null)
+        {
+            if(swal.isShowing())
+                swal.dismissWithAnimation();
+            swal = null;
+        }
+
+        swal = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText(title)
+                .setContentText(message)
+                .setConfirmText(confirm)
+                .setConfirmClickListener(confirmClick);
+        swal.setCanceledOnTouchOutside(cancelable);
+        swal.setCancelable(cancelable);
+        swal.show();
+    }
+
+    public static final void warningDialog(Context context, String title, String message, String confirm, SweetAlertDialog.OnSweetClickListener confirmClick, boolean cancelable)
+    {
+        if(swal != null)
+        {
+            if(swal.isShowing())
+                swal.dismissWithAnimation();
+            swal = null;
+        }
+
+        swal = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText(title)
+                .setContentText(message)
+                .setConfirmText(confirm)
+                .setConfirmClickListener(confirmClick);
+        swal.setCanceledOnTouchOutside(cancelable);
+        swal.setCancelable(cancelable);
         swal.show();
     }
 }

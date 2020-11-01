@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="4dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="12dp"
+        style="@style/CardView.Light">
+
+        <LinearLayout
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center|start">
+
+                <TextView
+                    android:id="@+id/class_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="start"
+                    android:textColor="@color/themeColor"
+                    android:text="@string/placeholder_class_name"
+                    android:textAppearance="?android:textAppearanceMedium"/>
+
+                <TextView
+                    android:id="@+id/class_department"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/poppins_light"
+                    android:gravity="start"
+                    android:textColor="@color/positiveColorClicked"
+                    android:text="@string/placeholder_department_name"
+                    android:textAppearance="?android:textAppearanceSmall"/>
+
+                <TextView
+                    android:id="@+id/class_adviser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/poppins_light"
+                    android:gravity="start"
+                    android:textColor="@color/positiveColorClicked"
+                    android:text="@string/placeholder_adviser_name"
+                    android:textAppearance="?android:textAppearanceSmall"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

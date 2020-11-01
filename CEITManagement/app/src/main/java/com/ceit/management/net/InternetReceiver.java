@@ -16,15 +16,8 @@ public class InternetReceiver extends BroadcastReceiver
         if(!intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))
             return;
 
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
-
-        boolean isConnected = (info != null) && ((info.getType() == ConnectivityManager.TYPE_MOBILE ||
-                info.getType() == ConnectivityManager.TYPE_WIFI ||
-                info.getType() == ConnectivityManager.TYPE_ETHERNET) && info.isConnected());
-
         if(listener != null)
-            listener.onInternetConnectionChanged(isConnected);
+            listener.onInternetConnectionChanged(isConnected(context));
     }
 
     public static boolean isConnected(Context context)
@@ -32,9 +25,7 @@ public class InternetReceiver extends BroadcastReceiver
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
 
-        return (info != null) && ((info.getType() == ConnectivityManager.TYPE_MOBILE ||
-                info.getType() == ConnectivityManager.TYPE_WIFI ||
-                info.getType() == ConnectivityManager.TYPE_ETHERNET) && info.isConnected());
+        return (info != null) && (info.isConnected());
     }
 
     public void setOnInternetConnectionChangedListener(OnInternetConnectionChangedListener listener)

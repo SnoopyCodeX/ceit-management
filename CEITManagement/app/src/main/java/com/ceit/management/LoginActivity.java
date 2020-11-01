@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
-import com.ceit.management.model.ResponseModel;
+import com.ceit.management.model.ServerResponse;
 import com.ceit.management.util.Constants;
 import com.ceit.management.util.PreferenceUtil;
 import com.google.android.material.textfield.TextInputLayout;
@@ -54,7 +55,7 @@ public class LoginActivity extends AppCompatActivity implements OnInternetConnec
             proceed();
 
         if(!AppInstance.isConnected(this))
-            DialogUtil.errorDialog(this, "Network Error", "You are not connected to an active network!", false);
+            DialogUtil.warningDialog(this, "Network Error", "You are not connected to an active network!", false);
         else
             DialogUtil.dismissDialog();
     }
@@ -63,7 +64,7 @@ public class LoginActivity extends AppCompatActivity implements OnInternetConnec
     public void onInternetConnectionChanged(boolean isConnected)
     {
         if(!isConnected)
-            DialogUtil.errorDialog(this, "Network Error", "You are not connected to an active network!", false);
+            DialogUtil.warningDialog(this, "Network Error", "You are not connected to an active network!", false);
         else
             DialogUtil.dismissDialog();
     }
@@ -125,23 +126,23 @@ public class LoginActivity extends AppCompatActivity implements OnInternetConnec
         });
     }
 
-    private void login(LoginCredentials creds)
+    private void login(LoginCredentials credentials)
     {
         if(!AppInstance.isConnected(this))
         {
-            DialogUtil.errorDialog(this, "Network Error", "You are not connected to an active network!", false);
+            DialogUtil.warningDialog(this, "Network Error", "You are not connected to an active network!", false);
             return;
         }
 
-        DialogUtil.progressDialog(this, "Logging in...", getResources().getColor(R.color.positiveColorDefault), false);
+        DialogUtil.progressDialog(this, "Logging in...", getResources().getColor(R.color.themeColor), false);
         UserAPI api = AppInstance.retrofit().create(UserAPI.class);
-        Call<ResponseModel> call = api.login(creds);
-        call.enqueue(new Callback<ResponseModel>() {
+        Call<ServerResponse> call = api.login(credentials);
+        call.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(@NotNull Call<ResponseModel> call, @NotNull Response<ResponseModel> response)
+            public void onResponse(@NotNull Call<ServerResponse> call, @NotNull Response<ServerResponse> response)
             {
                 DialogUtil.dismissDialog();
-                ResponseModel model = response.body();
+                ServerResponse model = response.body();
 
                 if(model != null)
                 {
@@ -160,30 +161,28 @@ public class LoginActivity extends AppCompatActivity implements OnInternetConnec
                             inputPassword.setError(message);
                         }
 
+                        DialogUtil.warningDialog(LoginActivity.this, "Login Failed", message, true);
                         return;
                     }
 
-                    String username = model.username;
-                    PreferenceUtil.putString(Constants.KEY_USERNAME, username);
-                    PreferenceUtil.getBoolean(Constants.KEY_LOGGEDIN, failed);
+                    PreferenceUtil.putBoolean(Constants.KEY_LOGGEDIN, !failed);
                     proceed();
-
                     return;
                 }
 
-                //DialogUtil.errorDialog(LoginActivity.this, "Login Failed", "An error occured while logging you in", "Okay", false);
-                proceed();
+                DialogUtil.errorDialog(LoginActivity.this, "Login Failed", "Server error occurred while logging in", true);
             }
 
             @Override
-            public void onFailure(@NotNull Call<ResponseModel> call, @NotNull Throwable t)
+            public void onFailure(@NotNull Call<ServerResponse> call, @NotNull Throwable t)
             {
                 DialogUtil.dismissDialog();
                 DialogUtil.errorDialog(LoginActivity.this, "Login Failed", t.getMessage(), "Okay", false);
-                proceed();
+                Log.e(LoginActivity.class.getSimpleName(), t.getMessage());
             }
         });
     }
+
     private void proceed()
     {
         startActivity(new Intent(this, MainActivity.class));

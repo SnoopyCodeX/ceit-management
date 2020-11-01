@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.ceit.management.util.Constants;
@@ -13,7 +14,7 @@ import com.ceit.management.util.PreferenceUtil;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -47,19 +48,23 @@ public class MainActivity extends AppCompatActivity
                     R.id.nav_class,
                     R.id.nav_students,
                     R.id.nav_parents,
-                    R.id.nav_settings
+                    R.id.nav_settings,
+                    R.id.nav_logout
                 )
                 .setOpenableLayout(drawer)
                 .build();
 
         dashboardClickObserver = new DashboardClickObserver();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-                @Override
-                public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments)
-                {
-                    currentFragmentID = destination.getId();
-                }
+        navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener((MenuItem item) -> {
+            PreferenceUtil.getPreference().edit().clear().apply();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+
+            return true;
+        });
+        navController.addOnDestinationChangedListener((@NonNull NavController controller, @NonNull NavDestination destination, Bundle arguments) -> {
+                currentFragmentID = destination.getId();
             }
         );
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -92,15 +97,6 @@ public class MainActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
-
-        unregisterReceiver(dashboardClickObserver);
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-
         unregisterReceiver(dashboardClickObserver);
     }
 

@@ -1,31 +1,36 @@
 package com.ceit.management.api;
 
 import com.ceit.management.model.ServerResponse;
-import com.ceit.management.model.TeacherInfoModel;
+import com.ceit.management.pojo.StudentItem;
+import com.ceit.management.pojo.TeacherItem;
 
-import java.util.List;
-
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface TeacherAPI
 {
-    @GET("teacher")
-    Call<List<TeacherInfoModel>> getAllTeachers();
+    @GET("teachers")
+    Call<ServerResponse<TeacherItem>> getAllTeachers();
 
-    @GET("teacher/{name}")
-    Call<TeacherInfoModel> getTeacherInfo(@Path("name") String name);
+    @GET("teachers/removed")
+    Call<ServerResponse<TeacherItem>> getAllRemovedTeachers();
 
-    @Multipart
-    @POST("teacher/new")
-    Call<ServerResponse> addNewTeacher(@Part MultipartBody.Part photo,
-                                       @Part("name") RequestBody name,
-                                       @Part("position") RequestBody position,
-                                       @Part("rank") RequestBody rank);
+    @GET("teachers/{id}")
+    Call<ServerResponse<StudentItem>> getTeacher(@Path("id") String id);
+
+    @POST("teachers/new")
+    Call<ServerResponse<TeacherItem>> addNewTeacher(@Body TeacherItem teacher);
+
+    @POST("teachers/{id}/delete")
+    Call<ServerResponse<TeacherItem>> deleteTeacher(@Path("id") String id);
+
+    @POST("teachers/{id}/restore")
+    Call<ServerResponse<TeacherItem>> restoreTeacher(@Path("id") String id);
+
+    @POST("teachers/{id}/update")
+    Call<ServerResponse<TeacherItem>> updateTeacher(@Path("id") String id,
+                                                    @Body TeacherItem teacher);
 }

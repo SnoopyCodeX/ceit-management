@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/transparent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:src="@drawable/server_error"
+        android:scaleType="fitXY"
+        app:tint="@color/themeColor"
+        android:contentDescription="@string/overlay_no_internet_connection" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textColor="@color/themeColor"
+        android:textStyle="bold"
+        android:fontFamily="@font/roboto_regular"
+        android:text="@string/overlay_server_error"/>
+
+</LinearLayout>

@@ -3,19 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:padding="4dp">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardBackgroundColor="@color/themeColor"
         app:cardCornerRadius="8dp"
-        app:cardElevation="6dp">
+        app:cardElevation="12dp"
+        style="@style/CardView.Light">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:background="?android:attr/selectableItemBackground">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/teacher_photo"
@@ -33,6 +34,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
                 android:orientation="vertical"
                 android:gravity="center|start">
 
@@ -43,39 +46,36 @@
                     android:layout_gravity="top"
                     android:fontFamily="@font/roboto_regular"
                     android:gravity="start"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
+                    android:textColor="@color/themeColor"
                     android:text="@string/placeholder_item_teacher_name"
-                    android:textAppearance="?android:textAppearanceLarge"/>
-
-                <TextView
-                    android:id="@+id/teacher_position"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:fontFamily="@font/roboto_regular"
-                    android:gravity="start"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:text="@string/placeholder_teacher_position"
-                    android:textAppearance="?android:textAppearanceSmall"/>
+                    android:textAppearance="?android:textAppearanceMedium"/>
 
                 <TextView
                     android:id="@+id/teacher_rank"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:fontFamily="@font/roboto_regular"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/poppins_light"
                     android:gravity="start"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
+                    android:textColor="@color/positiveColorClicked"
                     android:text="@string/placeholder_teacher_rank"
+                    android:textAppearance="?android:textAppearanceSmall"/>
+
+                <TextView
+                    android:id="@+id/teacher_gender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:fontFamily="@font/poppins_light"
+                    android:gravity="start"
+                    android:textColor="@color/positiveColorClicked"
+                    android:text="@string/placeholder_teacher_gender"
                     android:textAppearance="?android:textAppearanceSmall"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

@@ -31,6 +31,7 @@
                 tools:ignore="NestedWeights">
 
                 <LinearLayout
+                    android:background="?android:attr/selectableItemBackground"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -71,6 +72,7 @@
                 app:cardElevation="8dp">
 
                 <LinearLayout
+                    android:background="?android:attr/selectableItemBackground"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -119,6 +121,7 @@
                 app:cardElevation="8dp">
 
                 <LinearLayout
+                    android:background="?android:attr/selectableItemBackground"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -159,6 +162,7 @@
                 app:cardElevation="8dp">
 
                 <LinearLayout
+                    android:background="?android:attr/selectableItemBackground"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
