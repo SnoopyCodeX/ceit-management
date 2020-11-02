@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -49,10 +47,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
@@ -72,7 +67,6 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
     private StudentListAdapter studentListAdapter;
     private View root;
     private boolean editMode = false;
-    private boolean deletedTab = false;
 
     @SuppressLint("NonConstantResourceId")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,12 +87,16 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         curvedBottomNavigationView.setOnNavigationItemSelectedListener((MenuItem item) -> {
             switch (item.getItemId()) {
                 case R.id.bottom_nav_students:
+                    Constants.DELETE_STUDENT_TAB_ACTIVE = false;
+
                     studentListAdapter.clear();
                     refreshStudentListLayout.setRefreshing(true);
                     fetchAllStudents();
                     break;
 
                 case R.id.bottom_nav_removed:
+                    Constants.DELETE_STUDENT_TAB_ACTIVE = true;
+
                     studentListAdapter.clear();
                     refreshStudentListLayout.setRefreshing(true);
                     fetchAllRemovedStudents();
@@ -139,6 +137,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         super.onResume();
 
         IntentFilter modelPersonViewFilter = new IntentFilter(Constants.TRIGGER_MODAL_OPEN);
+        modelPersonViewFilter.addAction(Constants.TRIGGER_REFRESH_LIST);
         getContext().registerReceiver(modalViewPersonTriggerReceiver, modelPersonViewFilter);
     }
 
@@ -157,7 +156,11 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
     @Override
     public void onRefresh() {
         studentListAdapter.clear();
-        fetchAllStudents();
+
+        if(Constants.DELETE_STUDENT_TAB_ACTIVE)
+            fetchAllRemovedStudents();
+        else
+            fetchAllStudents();
     }
 
     @Override
@@ -284,20 +287,24 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
     private void viewStudent(StudentItem student)
     {
-        ShapeableImageView profile = root.findViewById(R.id.profile);
+        ShapeableImageView profile = root.findViewById(R.id.v_profile);
         ImageView cover = root.findViewById(R.id.background);
-        Button close = root.findViewById(R.id.close);
+        Button close = root.findViewById(R.id.v_close);
         Button edit = root.findViewById(R.id.btn_edit_profile);
-        TextInputEditText name = root.findViewById(R.id.name);
-        TextView birthday = root.findViewById(R.id.birthdate);
-        TextView gender = root.findViewById(R.id.gender);
-        TextView email = root.findViewById(R.id.email);
-        TextView number = root.findViewById(R.id.number);
-        TextView address = root.findViewById(R.id.address);
-        TextView section = root.findViewById(R.id.section);
-        TextView religion = root.findViewById(R.id.religion);
+        TextInputEditText name = root.findViewById(R.id.v_name);
+        TextView birthday = root.findViewById(R.id.v_birthdate);
+        TextView gender = root.findViewById(R.id.v_gender);
+        TextView email = root.findViewById(R.id.v_email);
+        TextView number = root.findViewById(R.id.v_number);
+        TextView address = root.findViewById(R.id.v_address);
+        TextView section = root.findViewById(R.id.v_section);
+        TextView religion = root.findViewById(R.id.v_religion);
 
         profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
+
+        //hide fab and bottom nav
+        curvedBottomNavigationView.setVisibility(View.GONE);
+        fabAdd.setVisibility(View.GONE);
 
         BlurImage.with(getContext())
                 .setBlurRadius(25f)
@@ -328,6 +335,9 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
         close.setOnClickListener(v -> {
             sheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            curvedBottomNavigationView.setVisibility(View.VISIBLE);
+            fabAdd.setVisibility(View.VISIBLE);
         });
 
         edit.setOnClickListener(v -> {
@@ -339,7 +349,12 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         @Override
         public void onReceive(Context context, Intent data)
         {
-            refreshStudentListLayout.setRefreshing(true);
+            if(data.getAction().equals(Constants.TRIGGER_REFRESH_LIST))
+            {
+                onRefresh();
+                return;
+            }
+
             int studentId = data.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_VIEW);
             int modalType = data.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_TYPE);
 

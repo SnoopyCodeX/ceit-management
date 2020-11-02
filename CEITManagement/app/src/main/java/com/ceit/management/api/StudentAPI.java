@@ -26,6 +26,9 @@ public interface StudentAPI
     @POST("students/{id}/delete")
     Call<ServerResponse<StudentItem>> deleteStudent(@Path("id") int id);
 
+    @POST("students/{id}/delete/permanent")
+    Call<ServerResponse<StudentItem>> permanentDeleteStudent(@Path("id") int id);
+
     @POST("students/{id}/restore")
     Call<ServerResponse<StudentItem>> restoreStudent(@Path("id") int id);
 

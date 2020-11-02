@@ -21,7 +21,7 @@ public class StudentItem
     @Expose
     public String email;
 
-    @SerializedName("contactNumber")
+    @SerializedName("contact_number")
     @Expose
     public String contactNumber;
 

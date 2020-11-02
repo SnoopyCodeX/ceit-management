@@ -17,18 +17,34 @@
         app:mode="same_level">
 
         <FrameLayout
-            android:id="@+id/delete_layout"
-            android:background="?android:attr/selectableItemBackground"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="70dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:background="@android:color/holo_red_dark"
-                android:textColor="@android:color/white"
-                android:text="Delete"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/delete_layout"
+                    android:layout_width="70dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:background="@android:color/holo_red_dark"
+                    android:textColor="@android:color/white"
+                    android:text="Delete"/>
+
+                <TextView
+                    android:id="@+id/restore_layout"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:background="#03A9F4"
+                    android:textColor="@android:color/white"
+                    android:text="Restore"/>
+
+            </LinearLayout>
 
         </FrameLayout>
 

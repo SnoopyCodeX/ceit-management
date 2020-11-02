@@ -25,7 +25,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,7 +47,10 @@ public class StudentListHolder extends BaseViewHolder
     public SwipeRevealLayout swipeRevealLayout;
 
     @BindView(R.id.delete_layout)
-    FrameLayout deleteLayout;
+    TextView deleteLayout;
+
+    @BindView(R.id.restore_layout)
+    TextView restoreLayout;
 
     @BindView(R.id.front_layout)
     FrameLayout frontLayout;
@@ -82,19 +84,28 @@ public class StudentListHolder extends BaseViewHolder
                 .into(photo);
 
         frontLayout.setOnClickListener(v -> {
+            if(swipeRevealLayout.isOpened())
+            {
+                swipeRevealLayout.close(true);
+                return;
+            }
+
             Intent trigger = new Intent(Constants.TRIGGER_MODAL_OPEN);
             trigger.putExtra(Constants.KEY_TRIGGER_MODAL_VIEW, student.id);
             trigger.putExtra(Constants.KEY_TRIGGER_MODAL_TYPE, 2);
             itemView.getContext().sendBroadcast(trigger);
         });
 
-        deleteLayout.setOnClickListener(v -> {
-            DialogUtil.warningDialog(itemView.getContext(), "Confirm Delete", "Are you sure you want to delete this?", "Yes", "No",
+        restoreLayout.setVisibility(Constants.DELETE_STUDENT_TAB_ACTIVE ? View.VISIBLE : View.GONE);
+
+        restoreLayout.setOnClickListener(v -> {
+            DialogUtil.warningDialog(itemView.getContext(), "Confirm Restore", "Are you sure you want to restore this?", "Yes", "No",
                     (dlg) -> {
                         dlg.dismissWithAnimation();
-                        DialogUtil.progressDialog(itemView.getContext(), "Deleting student", itemView.getContext().getResources().getColor(R.color.themeColor), false);
+
+                        DialogUtil.progressDialog(itemView.getContext(), "Restoring data...", itemView.getContext().getResources().getColor(R.color.themeColor), false);
                         StudentAPI api = AppInstance.retrofit().create(StudentAPI.class);
-                        Call<ServerResponse<StudentItem>> call = api.deleteStudent(student.id);
+                        Call<ServerResponse<StudentItem>> call = api.restoreStudent(student.id);
                         call.enqueue(new Callback<ServerResponse<StudentItem>>() {
                             @Override
                             public void onResponse(@NotNull Call<ServerResponse<StudentItem>> call, @NotNull Response<ServerResponse<StudentItem>> response)
@@ -103,20 +114,71 @@ public class StudentListHolder extends BaseViewHolder
                                 DialogUtil.dismissDialog();
 
                                 if(server != null && !server.hasError)
+                                {
+                                    itemView.getContext().sendBroadcast(new Intent(Constants.TRIGGER_REFRESH_LIST));
+                                    DialogUtil.successDialog(itemView.getContext(), "Restore Success", "Student has been restored successfully!");
+                                }
+                                else if(server != null && server.hasError)
+                                    DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", server.message);
+                                else
+                                    DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", "Server returned an unexpected result");
+
+                                swipeRevealLayout.close(true);
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull Call<ServerResponse<StudentItem>> call, @NotNull Throwable t) {
+                                DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", t.getMessage());
+
+                                swipeRevealLayout.close(true);
+                            }
+                        });
+                    },
+                    (dlg) -> {
+                        dlg.dismissWithAnimation();
+                        swipeRevealLayout.close(true);
+                    }, false);
+        });
+
+        deleteLayout.setOnClickListener(v -> {
+            DialogUtil.warningDialog(itemView.getContext(), Constants.DELETE_STUDENT_TAB_ACTIVE ? "Permanent Delete" : "Confirm Delete", Constants.DELETE_STUDENT_TAB_ACTIVE ? "Delete? This action cannot be reverted" : "Are you sure you want to delete this?", "Yes", "No",
+                    (dlg) -> {
+                        dlg.dismissWithAnimation();
+                        DialogUtil.progressDialog(itemView.getContext(), "Deleting student...", itemView.getContext().getResources().getColor(R.color.themeColor), false);
+                        StudentAPI api = AppInstance.retrofit().create(StudentAPI.class);
+                        Call<ServerResponse<StudentItem>> call = Constants.DELETE_STUDENT_TAB_ACTIVE ? api.permanentDeleteStudent(student.id) : api.deleteStudent(student.id);
+                        call.enqueue(new Callback<ServerResponse<StudentItem>>() {
+                            @Override
+                            public void onResponse(@NotNull Call<ServerResponse<StudentItem>> call, @NotNull Response<ServerResponse<StudentItem>> response)
+                            {
+                                ServerResponse<StudentItem> server = response.body();
+                                DialogUtil.dismissDialog();
+
+                                if(server != null && !server.hasError)
+                                {
+                                    itemView.getContext().sendBroadcast(new Intent(Constants.TRIGGER_REFRESH_LIST));
                                     DialogUtil.successDialog(itemView.getContext(), "Delete Success", "Student has been deleted successfully!");
+                                }
                                 else if(server != null && server.hasError)
                                     DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", server.message);
                                 else
                                     DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", "Server returned an unexpected result");
+
+                                swipeRevealLayout.close(true);
                             }
 
                             @Override
                             public void onFailure(@NotNull Call<ServerResponse<StudentItem>> call, @NotNull Throwable t) {
                                 DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", t.getMessage());
+
+                                swipeRevealLayout.close(true);
                             }
                         });
                     },
-                    SweetAlertDialog::dismissWithAnimation, false);
+                    (dlg) -> {
+                        dlg.dismissWithAnimation();
+                        swipeRevealLayout.close(true);
+                    }, false);
         });
     }
 

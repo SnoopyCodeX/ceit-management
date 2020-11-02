@@ -50,14 +50,14 @@
                 android:textColor="@color/white" />
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/profile"
+                android:id="@+id/v_profile"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_marginTop="80dp"
                 android:layout_centerHorizontal="true"/>
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/name"
+                android:id="@+id/v_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
@@ -65,7 +65,7 @@
                 android:textAppearance="?android:textAppearanceMedium"
                 android:textStyle="bold"
                 android:gravity="start"
-                android:layout_below="@id/profile"
+                android:layout_below="@id/v_profile"
                 android:layout_marginTop="30dp"
                 android:layout_marginLeft="40dp"
                 android:layout_marginRight="40dp"
@@ -78,15 +78,15 @@
                 android:id="@+id/clear_name"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_below="@id/profile"
+                android:layout_below="@id/v_profile"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="10dp"
-                android:layout_alignEnd="@id/name"
+                android:layout_alignEnd="@id/v_name"
                 android:src="@drawable/name"
                 app:tint="@color/white"/>
 
             <Button
-                android:id="@+id/close"
+                android:id="@+id/v_close"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -146,10 +146,10 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:background="@drawable/input_underline"
-                        android:padding="18dp">
+                        android:padding="14dp">
 
                         <TextView
-                            android:id="@+id/birthdate"
+                            android:id="@+id/v_birthdate"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -175,10 +175,10 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:background="@drawable/input_underline"
-                        android:padding="18dp">
+                        android:padding="14dp">
 
                         <TextView
-                            android:id="@+id/gender"
+                            android:id="@+id/v_gender"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -219,10 +219,10 @@
                     android:layout_below="@id/header_religion"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
-                    android:padding="18dp">
+                    android:padding="14dp">
 
                     <TextView
-                        android:id="@+id/religion"
+                        android:id="@+id/v_religion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -261,10 +261,10 @@
                     android:layout_below="@id/header_email"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
-                    android:padding="18dp">
+                    android:padding="14dp">
 
                     <TextView
-                        android:id="@+id/email"
+                        android:id="@+id/v_email"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -303,10 +303,10 @@
                     android:layout_below="@id/header_number"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
-                    android:padding="18dp">
+                    android:padding="14dp">
 
                     <TextView
-                        android:id="@+id/number"
+                        android:id="@+id/v_number"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -345,10 +345,10 @@
                     android:layout_below="@id/header_address"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
-                    android:padding="18dp">
+                    android:padding="14dp">
 
                     <TextView
-                        android:id="@+id/address"
+                        android:id="@+id/v_address"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -358,12 +358,12 @@
                         tools:ignore="NestedWeights" />
 
                     <ImageView
-                        android:layout_width="22dp"
+                        android:layout_width="16dp"
                         android:layout_height="22dp"
                         android:layout_marginStart="8dp"
                         android:layout_gravity="center_vertical"
                         android:scaleType="fitXY"
-                        android:src="@drawable/phone"
+                        android:src="@drawable/address"
                         app:tint="#87939A"/>
 
                 </LinearLayout>
@@ -387,10 +387,10 @@
                     android:layout_below="@id/header_section"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
-                    android:padding="18dp">
+                    android:padding="14dp">
 
                     <TextView
-                        android:id="@+id/section"
+                        android:id="@+id/v_section"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
