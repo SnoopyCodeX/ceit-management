@@ -31,7 +31,7 @@ android {
 dependencies {
     implementation 'cn.pedant.sweetalert:library:1.3'
 
-    compile 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
+    implementation 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
 
     implementation 'com.flipboard:bottomsheet-core:1.5.3'
     implementation 'com.flipboard:bottomsheet-commons:1.5.3'

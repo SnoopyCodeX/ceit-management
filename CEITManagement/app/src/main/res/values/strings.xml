@@ -52,4 +52,8 @@
     <string name="header_gender">Gender</string>
     <string name="caret_down">⋁</string>
     <string name="header_email">Email</string>
+    <string name="header_contact_number">Contact Number</string>
+    <string name="header_address">Address</string>
+    <string name="header_section">Section</string>
+    <string name="header_religion">Religion</string>
 </resources>

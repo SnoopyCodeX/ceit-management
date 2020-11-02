@@ -72,6 +72,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
     private StudentListAdapter studentListAdapter;
     private View root;
     private boolean editMode = false;
+    private boolean deletedTab = false;
 
     @SuppressLint("NonConstantResourceId")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -220,7 +221,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
                 ServerResponse<StudentItem> server = response.body();
                 refreshStudentListLayout.setRefreshing(false);
 
-                if (server != null) {
+                if (server != null && !server.hasError) {
                     List<StudentItem> studentItems = server.data;
                     studentListAdapter.addStudentItem(studentItems);
 
@@ -269,6 +270,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
             @Override
             public void onFailure(Call<ServerResponse<StudentItem>> call, Throwable t) {
+                DialogUtil.errorDialog(getContext(), t.getMessage(), "Okay");
                 refreshStudentListLayout.setRefreshing(false);
                 serverError();
             }
@@ -290,6 +292,10 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         TextView birthday = root.findViewById(R.id.birthdate);
         TextView gender = root.findViewById(R.id.gender);
         TextView email = root.findViewById(R.id.email);
+        TextView number = root.findViewById(R.id.number);
+        TextView address = root.findViewById(R.id.address);
+        TextView section = root.findViewById(R.id.section);
+        TextView religion = root.findViewById(R.id.religion);
 
         profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
 
@@ -310,6 +316,10 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         birthday.setText(student.birthday);
         gender.setText(student.gender);
         email.setText(student.email);
+        number.setText(student.contactNumber);
+        address.setText(student.address);
+        section.setText(student.section);
+        religion.setText(student.religion);
 
         ConstraintLayout bottomSheet = root.findViewById(R.id.sheet_info);
         BottomSheetBehavior<ConstraintLayout> sheet = BottomSheetBehavior.from(bottomSheet);
@@ -340,12 +350,14 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
                 return;
             }
 
+            DialogUtil.progressDialog(getContext(), "Loading student...", getContext().getResources().getColor(R.color.themeColor), false);
             StudentAPI api = AppInstance.retrofit().create(StudentAPI.class);
             Call<ServerResponse<StudentItem>> call = api.getStudent(studentId);
             call.enqueue(new Callback<ServerResponse<StudentItem>>() {
                 @Override
                 public void onResponse(@NotNull Call<ServerResponse<StudentItem>> call, @NotNull Response<ServerResponse<StudentItem>> response)
                 {
+                    DialogUtil.dismissDialog();
                     ServerResponse<StudentItem> server = response.body();
                     refreshStudentListLayout.setRefreshing(false);
 
