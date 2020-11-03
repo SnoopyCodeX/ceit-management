@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/sheet_info"
+    android:id="@+id/sheet_edit"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusable="true"
@@ -25,7 +25,7 @@
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/v_background"
+                android:id="@+id/e_background"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/desc_background"
@@ -37,7 +37,7 @@
                 android:background="#80000000"/>
 
             <Button
-                android:id="@+id/btn_edit_profile"
+                android:id="@+id/btn_save_cancel_profile"
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,18 +46,28 @@
                 android:fontFamily="@font/roboto_regular"
                 android:textAllCaps="true"
                 android:padding="10dp"
-                android:text="@string/button_edit_profile"
+                android:text="@string/btn_save_profile"
                 android:textColor="@color/white" />
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/v_profile"
+                android:id="@+id/e_profile"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_marginTop="80dp"
-                android:layout_centerHorizontal="true"/>
+                android:layout_centerHorizontal="true" />
+
+            <ImageView
+                android:id="@+id/change_photo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@id/e_profile"
+                android:layout_alignEnd="@id/e_profile"
+                android:layout_marginTop="-32dp"
+                android:layout_marginEnd="0dp"
+                android:src="@drawable/camera" />
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/v_name"
+                android:id="@+id/e_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
@@ -65,28 +75,28 @@
                 android:textAppearance="?android:textAppearanceMedium"
                 android:textStyle="bold"
                 android:gravity="start"
-                android:layout_below="@id/v_profile"
+                android:layout_below="@id/e_profile"
                 android:layout_marginTop="30dp"
                 android:layout_marginLeft="40dp"
                 android:layout_marginRight="40dp"
                 android:singleLine="true"
                 android:inputType="text"
-                android:enabled="false"
+                android:enabled="true"
                 app:backgroundTint="@color/white" />
 
             <ImageView
                 android:id="@+id/clear_name"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_below="@id/v_profile"
+                android:layout_below="@id/e_profile"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="10dp"
-                android:layout_alignEnd="@id/v_name"
+                android:layout_alignEnd="@id/e_name"
                 android:src="@drawable/name"
                 app:tint="@color/white"/>
 
             <Button
-                android:id="@+id/v_close"
+                android:id="@+id/e_close"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -130,14 +140,16 @@
                     android:textColor="#A0AAAF"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="110dp"
-                    android:fontFamily="@font/roboto_regular"/>
+                    android:fontFamily="@font/roboto_regular"
+                    tools:ignore="RelativeOverlap" />
 
                 <LinearLayout
                     android:id="@+id/upper_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_below="@id/header_birthday">
+                    android:layout_below="@id/header_birthday"
+                    android:baselineAligned="false">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -149,13 +161,14 @@
                         android:padding="14dp">
 
                         <TextView
-                            android:id="@+id/v_birthdate"
+                            android:id="@+id/e_birthdate"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textAppearance="?android:textAppearanceSmall"
                             android:textColor="@color/black"
                             android:text="Jun 21, 2002"
+                            android:inputType="date"
                             tools:ignore="NestedWeights" />
 
                         <ImageView
@@ -164,7 +177,8 @@
                             android:layout_marginStart="8dp"
                             android:layout_gravity="center_vertical"
                             android:src="@drawable/calendar"
-                            app:tint="#5E676C"/>
+                            app:tint="#5E676C"
+                            android:contentDescription="@string/desc_icon" />
 
                     </LinearLayout>
 
@@ -175,16 +189,16 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:background="@drawable/input_underline"
-                        android:padding="14dp">
+                        android:padding="14.6dp">
 
-                        <TextView
-                            android:id="@+id/v_gender"
+                        <Spinner
+
+                            android:id="@+id/e_gender"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:textAppearance="?android:textAppearanceSmall"
                             android:textColor="@color/black"
-                            android:text="Male"
                             tools:ignore="NestedWeights" />
 
                         <ImageView
@@ -194,7 +208,8 @@
                             android:layout_gravity="center_vertical"
                             android:scaleType="fitXY"
                             android:src="@drawable/genders"
-                            app:tint="#87939A"/>
+                            app:tint="#87939A"
+                            android:contentDescription="@string/desc_icon" />
 
                     </LinearLayout>
 
@@ -221,14 +236,16 @@
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
 
-                    <TextView
-                        android:id="@+id/v_religion"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:background="@android:color/transparent"
+                        android:id="@+id/e_religion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:textColor="@color/black"
                         android:text="No religion specified"
+                        android:inputType="text"
                         tools:ignore="NestedWeights" />
 
                     <ImageView
@@ -238,7 +255,8 @@
                         android:layout_gravity="center_vertical"
                         android:scaleType="fitXY"
                         android:src="@drawable/religion"
-                        app:tint="#87939A"/>
+                        app:tint="#87939A"
+                        android:contentDescription="@string/desc_icon" />
 
                 </LinearLayout>
 
@@ -263,14 +281,16 @@
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
 
-                    <TextView
-                        android:id="@+id/v_email"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:background="@android:color/transparent"
+                        android:id="@+id/e_email"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:textColor="@color/black"
                         android:text="testemail@gmail.com"
+                        android:inputType="textEmailAddress"
                         tools:ignore="NestedWeights" />
 
                     <ImageView
@@ -280,7 +300,8 @@
                         android:layout_gravity="center_vertical"
                         android:scaleType="fitXY"
                         android:src="@drawable/email"
-                        app:tint="#87939A"/>
+                        app:tint="#87939A"
+                        android:contentDescription="@string/desc_icon" />
 
                 </LinearLayout>
 
@@ -305,14 +326,16 @@
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
 
-                    <TextView
-                        android:id="@+id/v_number"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:background="@android:color/transparent"
+                        android:id="@+id/e_number"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:textColor="@color/black"
                         android:text="+639462978330"
+                        android:inputType="phone"
                         tools:ignore="NestedWeights" />
 
                     <ImageView
@@ -322,7 +345,8 @@
                         android:layout_gravity="center_vertical"
                         android:scaleType="fitXY"
                         android:src="@drawable/phone"
-                        app:tint="#87939A"/>
+                        app:tint="#87939A"
+                        android:contentDescription="@string/desc_icon" />
 
                 </LinearLayout>
 
@@ -347,14 +371,16 @@
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
 
-                    <TextView
-                        android:id="@+id/v_address"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:background="@android:color/transparent"
+                        android:id="@+id/e_address"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:textColor="@color/black"
                         android:text="Philippines"
+                        android:inputType="text"
                         tools:ignore="NestedWeights" />
 
                     <ImageView
@@ -364,7 +390,8 @@
                         android:layout_gravity="center_vertical"
                         android:scaleType="fitXY"
                         android:src="@drawable/address"
-                        app:tint="#87939A"/>
+                        app:tint="#87939A"
+                        android:contentDescription="@string/desc_icon" />
 
                 </LinearLayout>
 
@@ -389,14 +416,13 @@
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
 
-                    <TextView
-                        android:id="@+id/v_section"
+                    <Spinner
+                        android:id="@+id/e_section"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:textColor="@color/black"
-                        android:text="No section specified"
                         tools:ignore="NestedWeights" />
 
                     <ImageView
@@ -406,7 +432,8 @@
                         android:layout_gravity="center_vertical"
                         android:scaleType="fitXY"
                         android:src="@drawable/section"
-                        app:tint="#87939A"/>
+                        app:tint="#87939A"
+                        android:contentDescription="@string/desc_icon" />
 
                 </LinearLayout>
 

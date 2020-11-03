@@ -59,7 +59,7 @@
         android:focusable="true"
         android:contentDescription="@string/bot_nav_hidden_text"
         android:src="@android:drawable/ic_input_add"
-        android:tint="@color/white"
+        app:tint="@color/white"
         app:elevation="10dp"
         app:backgroundTint="@color/themeColor"/>
 
@@ -76,5 +76,8 @@
 
     <include
         layout="@layout/bs_student_info"/>
+
+    <include
+        layout="@layout/bs_student_edit_add"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

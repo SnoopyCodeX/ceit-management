@@ -1,21 +1,25 @@
 package com.ceit.management.ui;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,8 +51,12 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import retrofit2.Call;
@@ -282,13 +290,118 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
     private void updateStudent(StudentItem student)
     {
+        ShapeableImageView profile = root.findViewById(R.id.e_profile);
+        ImageView cover = root.findViewById(R.id.e_background);
 
+        ImageView changePhoto = root.findViewById(R.id.change_photo);
+        Button close = root.findViewById(R.id.e_close);
+        Button saveCancel = root.findViewById(R.id.btn_save_cancel_profile);
+
+        TextInputEditText name = root.findViewById(R.id.e_name);
+        TextView birthday = root.findViewById(R.id.e_birthdate);
+        Spinner gender = root.findViewById(R.id.e_gender);
+        TextInputEditText email = root.findViewById(R.id.e_email);
+        TextInputEditText number = root.findViewById(R.id.e_number);
+        TextInputEditText address = root.findViewById(R.id.e_address);
+        Spinner section = root.findViewById(R.id.e_section);
+        TextInputEditText religion = root.findViewById(R.id.e_religion);
+
+        profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
+        saveCancel.setText(R.string.btn_cancel_edit);
+
+        //hide fab and bottom nav
+        curvedBottomNavigationView.setVisibility(View.GONE);
+        fabAdd.setVisibility(View.GONE);
+
+        AtomicInteger counter = new AtomicInteger(1);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run()
+            {
+                if(counter.getAndIncrement() <= 2)
+                    handler.postDelayed(this, 1000);
+
+                BlurImage.with(getContext())
+                        .setBlurRadius(25f)
+                        .setBitmapScale(0.6f)
+                        .blurFromUri(student.photo)
+                        .into(cover);
+            }
+        }, 1000l);
+
+        Glide.with(getContext())
+                .load(student.photo)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(R.drawable.student)
+                .error(R.drawable.student)
+                .into(profile);
+
+        name.setText(student.name);
+        birthday.setText(student.birthday);
+        email.setText(student.email);
+        number.setText(student.contactNumber);
+        address.setText(student.address);
+        religion.setText(student.religion);
+
+        ConstraintLayout bottomEditAddSheet = root.findViewById(R.id.sheet_edit);
+        BottomSheetBehavior<ConstraintLayout> editAddSheet = BottomSheetBehavior.from(bottomEditAddSheet);
+        editAddSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
+        editAddSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        birthday.setOnClickListener(v -> {
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date(birthday.getText().toString()));
+            DatePickerDialog picker = new DatePickerDialog(getContext(), (view, year, month, date) -> {
+                Calendar newCalendar = Calendar.getInstance();
+                newCalendar.set(year, month, date);
+
+                String strBday = DateFormat.getDateInstance().format(newCalendar.getTime());
+                birthday.setText(strBday);
+                student.birthday = strBday;
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH));
+
+            picker.show();
+        });
+
+        String[] genders = {"Male", "Female"};
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, genders);
+        gender.setAdapter(genderAdapter);
+        gender.setSelection(student.gender.toLowerCase().equals("male") ? 0 : 1);
+        gender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+             @Override
+             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+             {
+                 student.gender = genders[position];
+             }
+
+             @Override
+             public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        changePhoto.setOnClickListener(v -> {
+
+        });
+
+        close.setOnClickListener(v -> {
+            editAddSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            curvedBottomNavigationView.setVisibility(View.VISIBLE);
+            fabAdd.setVisibility(View.VISIBLE);
+        });
+
+        saveCancel.setOnClickListener(v -> {
+
+        });
     }
 
     private void viewStudent(StudentItem student)
     {
         ShapeableImageView profile = root.findViewById(R.id.v_profile);
-        ImageView cover = root.findViewById(R.id.background);
+        ImageView cover = root.findViewById(R.id.v_background);
         Button close = root.findViewById(R.id.v_close);
         Button edit = root.findViewById(R.id.btn_edit_profile);
         TextInputEditText name = root.findViewById(R.id.v_name);
@@ -321,27 +434,31 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
         name.setText(student.name);
         birthday.setText(student.birthday);
-        gender.setText(student.gender);
         email.setText(student.email);
         number.setText(student.contactNumber);
         address.setText(student.address);
-        section.setText(student.section);
         religion.setText(student.religion);
 
-        ConstraintLayout bottomSheet = root.findViewById(R.id.sheet_info);
-        BottomSheetBehavior<ConstraintLayout> sheet = BottomSheetBehavior.from(bottomSheet);
-        sheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
-        sheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+        ConstraintLayout bottomViewSheet = root.findViewById(R.id.sheet_info);
+        BottomSheetBehavior<ConstraintLayout> viewSheet = BottomSheetBehavior.from(bottomViewSheet);
+        viewSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
+        viewSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         close.setOnClickListener(v -> {
-            sheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+            viewSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
 
             curvedBottomNavigationView.setVisibility(View.VISIBLE);
             fabAdd.setVisibility(View.VISIBLE);
         });
 
         edit.setOnClickListener(v -> {
-            sheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+            viewSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            Intent editBroadcast = new Intent(Constants.TRIGGER_MODAL_OPEN);
+            editBroadcast.putExtra(Constants.KEY_TRIGGER_MODAL_VIEW, student.id);
+            editBroadcast.putExtra(Constants.KEY_TRIGGER_MODAL_TYPE, 2);
+            editBroadcast.putExtra(Constants.KEY_TRIGGER_ACTION_TYPE, 1);
+            getContext().sendBroadcast(editBroadcast);
         });
     }
 
@@ -357,6 +474,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
             int studentId = data.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_VIEW);
             int modalType = data.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_TYPE);
+            int modalAction = data.getExtras().getInt(Constants.KEY_TRIGGER_ACTION_TYPE);
 
 
             if(modalType != 2)
@@ -380,8 +498,12 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
                     {
                         List<StudentItem> studentItems = server.data;
 
-                        if(studentItems != null)
+                        if(studentItems != null && modalAction == 0)
                             viewStudent(studentItems.get(0));
+                        else if(studentItems != null && modalAction == 1)
+                            updateStudent(studentItems.get(0));
+                        else if(studentItems != null &&  modalAction == 2)
+                        {}
                         else
                             DialogUtil.errorDialog(context, server.message, "Okay");
                     }

@@ -56,4 +56,7 @@
     <string name="header_address">Address</string>
     <string name="header_section">Section</string>
     <string name="header_religion">Religion</string>
+    <string name="btn_save_profile">Save Profile</string>
+    <string name="btn_cancel_edit">Cancel Edit</string>
+    <string name="desc_icon">icon</string>
 </resources>

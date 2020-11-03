@@ -57,7 +57,7 @@
         android:clickable="true"
         android:focusable="true"
         android:contentDescription="@string/bot_nav_hidden_text"
-        android:src="@drawable/add_teacher"
+        android:src="@android:drawable/ic_input_add"
         app:tint="@color/white"
         app:elevation="10dp"
         app:backgroundTint="@color/themeColor"/>
