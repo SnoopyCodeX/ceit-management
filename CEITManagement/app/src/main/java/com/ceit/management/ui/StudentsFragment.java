@@ -6,8 +6,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +25,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -34,19 +38,23 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ceit.management.AppInstance;
 import com.ceit.management.R;
 import com.ceit.management.adapter.StudentListAdapter;
+import com.ceit.management.api.ClassAPI;
 import com.ceit.management.api.StudentAPI;
 import com.ceit.management.model.ServerResponse;
 import com.ceit.management.net.BlurImage;
 import com.ceit.management.net.InternetReceiver;
+import com.ceit.management.pojo.ClassItem;
 import com.ceit.management.pojo.StudentItem;
 import com.ceit.management.util.Constants;
 import com.ceit.management.util.DialogUtil;
+import com.ceit.management.util.ImageUtil;
 import com.ceit.management.view.CurvedBottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +65,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import retrofit2.Call;
@@ -74,6 +83,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
     private RecyclerView listStudents;
     private StudentListAdapter studentListAdapter;
     private View root;
+
     private boolean editMode = false;
 
     @SuppressLint("NonConstantResourceId")
@@ -147,6 +157,41 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         IntentFilter modelPersonViewFilter = new IntentFilter(Constants.TRIGGER_MODAL_OPEN);
         modelPersonViewFilter.addAction(Constants.TRIGGER_REFRESH_LIST);
         getContext().registerReceiver(modalViewPersonTriggerReceiver, modelPersonViewFilter);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        if(requestCode == Constants.CODE_PICK_IMAGE && resultCode == AppCompatActivity.RESULT_OK)
+        {
+            ShapeableImageView profile = root.findViewById(R.id.e_profile);
+            ImageView cover = root.findViewById(R.id.e_background);
+
+            Bitmap photo = ImageUtil.imageUriToBitmap(getContext(), data.getData());
+            String base64Image = ImageUtil.imageToBase64(photo);
+
+            AtomicInteger counter = new AtomicInteger(1);
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run()
+                {
+                    if(counter.getAndIncrement() <= 2)
+                        handler.postDelayed(this, 1000);
+
+                    BlurImage.with(getContext())
+                            .setBlurRadius(25f)
+                            .setBitmapScale(0.6f)
+                            .blur(photo)
+                            .into(cover);
+                }
+            }, 1000l);
+
+            profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
+            profile.setImageBitmap(photo);
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -288,6 +333,86 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         });
     }
 
+    private void fetchAllClasses(String selectedClass)
+    {
+        final Spinner section = root.findViewById(R.id.e_section);
+
+        ClassAPI api = AppInstance.retrofit().create(ClassAPI.class);
+        Call<ServerResponse<ClassItem>> call = api.getAllClasses();
+        call.enqueue(new Callback<ServerResponse<ClassItem>>() {
+            @Override
+            public void onResponse(Call<ServerResponse<ClassItem>> call, Response<ServerResponse<ClassItem>> response)
+            {
+                ServerResponse<ClassItem> server = response.body();
+
+                if(server != null && !server.hasError && server.data.size() > 0)
+                {
+                    List<ClassItem> items = server.data;
+                    String[] names = new String[items.size()];
+                    int defIndex = 0;
+
+                    for(int i = 0; i < items.size(); i++)
+                    {
+                        if(items.get(i).name.toLowerCase().equals(selectedClass.toLowerCase()))
+                            defIndex = i;
+                        names[i] = items.get(i).name;
+                    }
+
+                    ArrayAdapter<String> classAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
+                    section.setAdapter(classAdapter);
+                    section.setSelection(defIndex);
+
+                }
+                else
+                {
+                    List<ClassItem> fallbackItem = new ArrayList<>();
+                    ClassItem classItem = ClassItem.newClass();
+                    classItem.name = "No classes available";
+                    classItem.id = -1;
+                    fallbackItem.add(classItem);
+
+                    String[] names = new String[fallbackItem.size()];
+                    int defIndex = 0;
+
+                    for(int i = 0; i < fallbackItem.size(); i++)
+                    {
+                        if(fallbackItem.get(i).name.toLowerCase().equals(selectedClass.toLowerCase()))
+                            defIndex = i;
+                        names[i] = fallbackItem.get(i).name;
+                    }
+
+                    ArrayAdapter<String> classAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
+                    section.setAdapter(classAdapter);
+                    section.setSelection(defIndex);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerResponse<ClassItem>> call, Throwable t)
+            {
+                List<ClassItem> fallbackItem = new ArrayList<>();
+                ClassItem classItem = ClassItem.newClass();
+                classItem.name = "No classes available";
+                classItem.id = -1;
+                fallbackItem.add(classItem);
+
+                String[] names = new String[fallbackItem.size()];
+                int defIndex = 0;
+
+                for(int i = 0; i < fallbackItem.size(); i++)
+                {
+                    if(fallbackItem.get(i).name.toLowerCase().equals(selectedClass.toLowerCase()))
+                        defIndex = i;
+                    names[i] = fallbackItem.get(i).name;
+                }
+
+                ArrayAdapter<String> classAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
+                section.setAdapter(classAdapter);
+                section.setSelection(defIndex);
+            }
+        });
+    }
+
     private void updateStudent(StudentItem student)
     {
         ShapeableImageView profile = root.findViewById(R.id.e_profile);
@@ -307,7 +432,6 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         TextInputEditText religion = root.findViewById(R.id.e_religion);
 
         profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
-        saveCancel.setText(R.string.btn_cancel_edit);
 
         //hide fab and bottom nav
         curvedBottomNavigationView.setVisibility(View.GONE);
@@ -351,7 +475,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
         birthday.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date(birthday.getText().toString()));
+            calendar.setTime(new Date("Jan 1, 1990"));
             DatePickerDialog picker = new DatePickerDialog(getContext(), (view, year, month, date) -> {
                 Calendar newCalendar = Calendar.getInstance();
                 newCalendar.set(year, month, date);
@@ -364,6 +488,9 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH));
 
+            Calendar bday = Calendar.getInstance();
+            bday.setTime(new Date(birthday.getText().toString()));
+            picker.getDatePicker().updateDate(bday.get(Calendar.YEAR), bday.get(Calendar.MONTH), bday.get(Calendar.DAY_OF_MONTH));
             picker.show();
         });
 
@@ -379,11 +506,27 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
              }
 
              @Override
-             public void onNothingSelected(AdapterView<?> parent) {}
+             public void onNothingSelected(AdapterView<?> parent)
+             {}
+        });
+
+        section.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                String item = (String) parent.getAdapter().getItem(position);
+                student.section = item;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {}
         });
 
         changePhoto.setOnClickListener(v -> {
-
+            Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickIntent.setType("image/*");
+            startActivityForResult(Intent.createChooser(pickIntent, "Choose image..."), Constants.CODE_PICK_IMAGE);
         });
 
         close.setOnClickListener(v -> {
@@ -396,6 +539,8 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         saveCancel.setOnClickListener(v -> {
 
         });
+
+        fetchAllClasses(student.section);
     }
 
     private void viewStudent(StudentItem student)

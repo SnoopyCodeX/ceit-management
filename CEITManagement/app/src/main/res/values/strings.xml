@@ -59,4 +59,23 @@
     <string name="btn_save_profile">Save Profile</string>
     <string name="btn_cancel_edit">Cancel Edit</string>
     <string name="desc_icon">icon</string>
+    <string name="input_class_name">Class Name</string>
+    <string name="input_class_department">Class Department</string>
+    <string name="input_class_teacher">Class Teacher</string>
+    <string name="str_btn_add_class">Add Class</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="header_occupation">Occupation</string>
+    <string name="hint_occupation">Occupation</string>
+    <string name="hint_address">Address</string>
+    <string name="hint_contact_number">+639-xxx-xxx-xxx</string>
+    <string name="hint_email_address">youremailaddress@gmail.com</string>
+    <string name="hint_religion">Your religion</string>
+    <string name="empty_string">" "</string>
+    <string name="hint_birth_date">Birth Date</string>
+    <string name="btn_add_parent">Add Parent</string>
+    <string name="str_add_child">Add Child</string>
+    <string name="no_child_selected">No child selected</string>
+    <string name="hint_enter_child_s_name">Enter child\'s name</string>
+    <string name="header_child">Child</string>
+    <string name="hint_full_name">Full name</string>
 </resources>

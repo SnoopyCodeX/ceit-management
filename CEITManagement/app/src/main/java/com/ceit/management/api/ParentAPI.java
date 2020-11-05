@@ -18,18 +18,21 @@ public interface ParentAPI
     Call<ServerResponse<ParentItem>> getAllRemovedParents();
 
     @GET("parents/{id}")
-    Call<ServerResponse<ParentItem>> getParent(@Path("id") String id);
+    Call<ServerResponse<ParentItem>> getParent(@Path("id") int id);
 
     @POST("parents/new")
     Call<ServerResponse<ParentItem>> addNewParent(@Body ParentItem parent);
 
     @POST("parents/{id}/delete")
-    Call<ServerResponse<ParentItem>> deleteParent(@Path("id") String id);
+    Call<ServerResponse<ParentItem>> deleteParent(@Path("id") int id);
+
+    @POST("parents/{id}/delete/permanent")
+    Call<ServerResponse<ParentItem>> permanentDeleteParent(@Path("id") int id);
 
     @POST("parents/{id}/restore")
-    Call<ServerResponse<ParentItem>> restoreParent(@Path("id") String id);
+    Call<ServerResponse<ParentItem>> restoreParent(@Path("id") int id);
 
     @POST("parents/{id}/update")
-    Call<ServerResponse<ParentItem>> updateParent(@Path("id") String id,
+    Call<ServerResponse<ParentItem>> updateParent(@Path("id") int id,
                                                   @Body ParentItem parent);
 }

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 public class StudentItem
 {
     @SerializedName("id")
-    @Expose
+    @Expose(serialize = false, deserialize = true)
     public int id;
 
     @SerializedName("name")
@@ -44,14 +44,6 @@ public class StudentItem
     @SerializedName("photo")
     @Expose
     public String photo;
-
-    @SerializedName("hasError")
-    @Expose
-    public boolean hasError;
-
-    @SerializedName("message")
-    @Expose
-    public String message;
 
     private StudentItem()
     {}

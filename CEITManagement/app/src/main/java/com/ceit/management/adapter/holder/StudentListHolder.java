@@ -3,6 +3,7 @@ package com.ceit.management.adapter.holder;
 import android.content.Intent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -47,10 +48,10 @@ public class StudentListHolder extends BaseViewHolder
     public SwipeRevealLayout swipeRevealLayout;
 
     @BindView(R.id.delete_layout)
-    TextView deleteLayout;
+    ImageView deleteLayout;
 
     @BindView(R.id.restore_layout)
-    TextView restoreLayout;
+    ImageView restoreLayout;
 
     @BindView(R.id.front_layout)
     FrameLayout frontLayout;

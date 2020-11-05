@@ -35,6 +35,7 @@ public class AppInstance extends Application
         if(retrofit == null)
         {
             Gson gson = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
                     .setLenient()
                     .create();
 

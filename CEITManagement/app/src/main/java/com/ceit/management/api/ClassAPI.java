@@ -18,22 +18,25 @@ public interface ClassAPI
     Call<ServerResponse<ClassItem>> getAllRemovedClasses();
 
     @GET("classes/{id}")
-    Call<ServerResponse<ClassItem>> getClass(@Path("id") String id);
+    Call<ServerResponse<ClassItem>> getClass(@Path("id") int id);
 
     @POST("classes/new")
     Call<ServerResponse<ClassItem>> addNewClass(@Body ClassItem classItem);
 
     @POST("classes/{id}/delete")
-    Call<ServerResponse<ClassItem>> deleteClass(@Path("id") String id);
+    Call<ServerResponse<ClassItem>> deleteClass(@Path("id") int id);
+
+    @POST("classes/{id}/delete/permanent")
+    Call<ServerResponse<ClassItem>> permanentDeleteClass(@Path("id") int id);
 
     @POST("classes/{classId}/remove/{studentId}")
-    Call<ServerResponse<ClassItem>> removeStudentFromClass(@Path("classId") String classId,
+    Call<ServerResponse<ClassItem>> removeStudentFromClass(@Path("classId") int classId,
                                                            @Path("studentId") String studentId);
 
     @POST("classes/{id}/restore")
-    Call<ServerResponse<ClassItem>> restoreClass(@Path("id") String id);
+    Call<ServerResponse<ClassItem>> restoreClass(@Path("id") int id);
 
     @POST("classes/{id}/update")
-    Call<ServerResponse<ClassItem>> updateClass(@Path("id") String id,
+    Call<ServerResponse<ClassItem>> updateClass(@Path("id") int id,
                                                 @Body ClassItem classItem);
 }

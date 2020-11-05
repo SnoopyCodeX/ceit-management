@@ -12,6 +12,7 @@ import com.ceit.management.R;
 import com.ceit.management.adapter.holder.BaseViewHolder;
 import com.ceit.management.adapter.holder.ClassListHolder;
 import com.ceit.management.pojo.ClassItem;
+import com.chauthai.swipereveallayout.ViewBinderHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class ClassListAdapter extends RecyclerView.Adapter<BaseViewHolder> imple
 {
     private static final int VIEW_TYPE_NORMAL = 1;
 
+    private ViewBinderHelper binderHelper = new ViewBinderHelper();
     private List<ClassItem> classItems;
     private List<ClassItem> copy;
 
@@ -28,6 +30,8 @@ public class ClassListAdapter extends RecyclerView.Adapter<BaseViewHolder> imple
         this.copy = new ArrayList<>();
         this.classItems = classItems;
         this.copy.addAll(classItems);
+
+        binderHelper.setOpenOnlyOne(true);
     }
 
     @NonNull
@@ -40,7 +44,11 @@ public class ClassListAdapter extends RecyclerView.Adapter<BaseViewHolder> imple
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position)
     {
-        holder.onBind(position);
+        if(classItems != null && 0 <= position && position < classItems.size())
+        {
+            binderHelper.bind(((ClassListHolder) holder).swipeRevealLayout, classItems.get(position).name + "_" + classItems.get(position).id);
+            holder.onBind(position);
+        }
     }
 
     @Override

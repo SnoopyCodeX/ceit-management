@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 public class ParentItem
 {
     @SerializedName("id")
-    @Expose
+    @Expose(serialize = false, deserialize = true)
     public int id;
 
     @SerializedName("name")
@@ -19,7 +19,7 @@ public class ParentItem
 
     @SerializedName("child")
     @Expose
-    public String child;
+    public int[] child;
 
     @SerializedName("religion")
     @Expose
@@ -49,18 +49,10 @@ public class ParentItem
     @Expose
     public String photo;
 
-    @SerializedName("hasError")
-    @Expose
-    public boolean hasError;
-
-    @SerializedName("message")
-    @Expose
-    public String message;
-
     private ParentItem()
     {}
 
-    private ParentItem(String name, String gender, String child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
+    private ParentItem(String name, String gender, int[] child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
     {
         this.name = name;
         this.gender = gender;
@@ -74,7 +66,7 @@ public class ParentItem
         this.photo = photo;
     }
 
-    private ParentItem(int id, String name, String gender, String child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
+    private ParentItem(int id, String name, String gender, int[] child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
     {
         this.id = id;
         this.name = name;
@@ -89,7 +81,7 @@ public class ParentItem
         this.photo = photo;
     }
 
-    public static synchronized ParentItem newParent(String name, String gender, String child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
+    public static synchronized ParentItem newParent(String name, String gender, int[] child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
     {
         return new ParentItem(name, gender, child, religion, birthday, address, contactNumber, email, occupation, photo);
     }

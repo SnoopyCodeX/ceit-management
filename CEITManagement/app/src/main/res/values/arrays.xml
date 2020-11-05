@@ -29,4 +29,7 @@
         <item>CAS - BSES</item>
         <item>CAS - BSMATH</item>
     </string-array>
+    <string-array name="empty_teacher">
+        <item>No teacher available</item>
+    </string-array>
 </resources>
