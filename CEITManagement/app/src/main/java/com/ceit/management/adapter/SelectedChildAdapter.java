@@ -28,6 +28,7 @@ public class SelectedChildAdapter extends ArrayAdapter<StudentItem>
     private OnItemsChangedListener listener2;
     private OnListEmptyListener listener1;
     private List<StudentItem> students;
+    private boolean editMode = false;
     private Context context;
 
     public SelectedChildAdapter(Context context, ArrayList<StudentItem> list)
@@ -58,15 +59,16 @@ public class SelectedChildAdapter extends ArrayAdapter<StudentItem>
                 .error(R.drawable.student)
                 .into(profile);
 
+        remove.setVisibility(editMode ? View.VISIBLE : View.GONE);
         remove.setOnClickListener(v -> {
+            if(listener2 != null)
+                listener2.onItemChanged(students.get(position).id, -1);
+
             students.remove(position);
             this.notifyDataSetChanged();
 
             if(students.isEmpty() && listener1 != null)
                 listener1.onListEmpty();
-
-            if(listener2 != null)
-                listener2.onItemChanged();
         });
 
         name.setText(student.name);
@@ -91,6 +93,9 @@ public class SelectedChildAdapter extends ArrayAdapter<StudentItem>
     {
         students.add(object);
         this.notifyDataSetChanged();
+
+        if(listener2 != null)
+            listener2.onItemChanged(object.id, 1);
     }
 
     @Override
@@ -116,11 +121,16 @@ public class SelectedChildAdapter extends ArrayAdapter<StudentItem>
         return ids;
     }
 
+    public void setEditMode(boolean editMode)
+    {
+        this.editMode = editMode;
+    }
+
     public static interface OnListEmptyListener {
         public void onListEmpty();
     }
 
     public static interface OnItemsChangedListener {
-        public void onItemChanged();
+        public void onItemChanged(int id, int type);
     }
 }

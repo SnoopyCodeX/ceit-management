@@ -23,6 +23,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,10 +56,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@SuppressWarnings("ALL")
 public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, InternetReceiver.OnInternetConnectionChangedListener
 {
     private WaveSwipeRefreshLayout refreshClassListLayout;
     private CurvedBottomNavigationView curvedBottomNavigationView;
+    private NestedScrollView scroller;
     private FloatingActionButton fabAdd;
     private LinearLayout overlayNoWifi;
     private LinearLayout overlayNodataFound;
@@ -74,6 +77,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         root = inflater.inflate(R.layout.fragment_class, container, false);
         refreshClassListLayout = root.findViewById(R.id.refresh_classes_list);
         curvedBottomNavigationView = root.findViewById(R.id.bottom_nav_classes);
+        scroller = root.findViewById(R.id.scroller);
         fabAdd = root.findViewById(R.id.fab);
         overlayNoWifi = root.findViewById(R.id.no_wifi_layout);
         overlayNodataFound = root.findViewById(R.id.no_data_layout);
@@ -143,6 +147,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         super.onResume();
 
         IntentFilter filter = new IntentFilter(Constants.TRIGGER_REFRESH_LIST);
+        filter.addAction(Constants.TRIGGER_MODAL_OPEN);
         getContext().registerReceiver(receiver, filter);
     }
 
@@ -191,7 +196,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.VISIBLE);
-        listClasses.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void noDataFound()
@@ -199,7 +204,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.VISIBLE);
         overlayNoWifi.setVisibility(View.GONE);
-        listClasses.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void serverError()
@@ -207,7 +212,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         overlayServerError.setVisibility(View.VISIBLE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listClasses.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void connectedToInternet()
@@ -215,7 +220,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listClasses.setVisibility(View.VISIBLE);
+        scroller.setVisibility(View.VISIBLE);
     }
 
     private void dataFound()
@@ -223,7 +228,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listClasses.setVisibility(View.VISIBLE);
+        scroller.setVisibility(View.VISIBLE);
     }
 
     private void fetchAllClasses()
@@ -320,6 +325,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
 
     private void showAddClass()
     {
+        ArrayAdapter<String> deptAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getContext().getResources().getStringArray(R.array.dept_college_list));
         TextInputLayout name = root.findViewById(R.id.input_classname);
         AppCompatSpinner dept = root.findViewById(R.id.input_class_dept);
         AppCompatSpinner tea = root.findViewById(R.id.input_class_teacher);
@@ -331,12 +337,15 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         addSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
         addSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
 
+        dept.setAdapter(deptAdapter);
+        dept.setSelection(0);
+
         // Hide bottom nav and fab
         curvedBottomNavigationView.setVisibility(View.GONE);
         fabAdd.setVisibility(View.GONE);
 
         // Fetch all available teachers and populate the teacher spinner
-        fetchTeachers();
+        fetchTeachers("");
 
         add.setOnClickListener(v -> {
             String str_name = name.getEditText().getText().toString();
@@ -383,24 +392,33 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         });
 
         close.setOnClickListener(v -> {
-            name.getEditText().clearComposingText();
+            name.getEditText().setText("");
             name.getEditText().clearFocus();
             name.setError("");
             addSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            tea.setSelection(0);
+            dept.setSelection(0);
+
+            name.setEnabled(true);
+            dept.setEnabled(true);
+            tea.setEnabled(true);
 
             curvedBottomNavigationView.setVisibility(View.VISIBLE);
             fabAdd.setVisibility(View.VISIBLE);
         });
     }
 
-    private void fetchTeachers()
+    private void fetchTeachers(String selected)
     {
+        DialogUtil.progressDialog(getContext(), "Preparing form...", getContext().getResources().getColor(R.color.themeColor), false);
         TeacherAPI api = AppInstance.retrofit().create(TeacherAPI.class);
         Call<ServerResponse<TeacherItem>> call = api.getAllTeachers();
         call.enqueue(new Callback<ServerResponse<TeacherItem>>() {
             @Override
             public void onResponse(@NotNull Call<ServerResponse<TeacherItem>> call, @NotNull Response<ServerResponse<TeacherItem>> response)
             {
+                DialogUtil.dismissDialog();
                 AppCompatSpinner teacherSpinner = root.findViewById(R.id.input_class_teacher);
                 ServerResponse<TeacherItem> server = response.body();
 
@@ -408,19 +426,172 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                 {
                     List<TeacherItem> teachers = server.data;
                     String[] names = new String[teachers.size()];
-
+                    int selection = 0;
                     for(int i = 0; i < teachers.size(); i++)
+                    {
+                        if(teachers.get(i).name.toLowerCase().equals(selected.toLowerCase()))
+                            selection = i;
                         names[i] = teachers.get(i).name;
+                    }
 
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
                     teacherSpinner.setAdapter(adapter);
-                    teacherSpinner.setSelection(0);
+                    teacherSpinner.setSelection(selection);
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call<ServerResponse<TeacherItem>> call, @NotNull Throwable t)
-            {}
+            {
+                DialogUtil.dismissDialog();
+                DialogUtil.errorDialog(getContext(), "Preparation Failed", t.getMessage(), "Okay", false);
+            }
+        });
+    }
+
+    private void editClass(ClassItem item)
+    {
+        String[] departments = getContext().getResources().getStringArray(R.array.dept_college_list);
+        ArrayAdapter<String> deptAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, departments);
+        TextInputLayout name = root.findViewById(R.id.input_classname);
+        AppCompatSpinner dept = root.findViewById(R.id.input_class_dept);
+        AppCompatSpinner tea = root.findViewById(R.id.input_class_teacher);
+        AppCompatButton save = root.findViewById(R.id.btn_add_class);
+        AppCompatButton close = root.findViewById(R.id.btn_cancel);
+
+        save.setText("Save Class");
+        fetchTeachers(item.teacher);
+        name.getEditText().setText(item.name);
+
+        int selection = 0;
+        dept.setAdapter(deptAdapter);
+        for(String department : departments)
+            if(department.replaceAll("\\s+", "").toLowerCase().equals(item.department.replaceAll("\\s+", "").toLowerCase()))
+            {
+                dept.setSelection(selection);
+                break;
+            }
+            else
+                selection += 1;
+
+        ConstraintLayout sheet = root.findViewById(R.id.sheet_edit);
+        BottomSheetBehavior<ConstraintLayout> editSheet = BottomSheetBehavior.from(sheet);
+        editSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
+        editSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        // Hide bottom nav and fab
+        curvedBottomNavigationView.setVisibility(View.GONE);
+        fabAdd.setVisibility(View.GONE);
+
+        save.setOnClickListener(v -> {
+            if(name.getEditText().toString().isEmpty() || name.getEditText().toString().length() <= 4)
+                DialogUtil.errorDialog(getContext(), "Invalide Name", "Invalid class name, name must be more than 4 characters long", "Okay", false);
+            else
+            {
+                DialogUtil.progressDialog(getContext(), "Updating class...", getContext().getResources().getColor(R.color.themeColor), false);
+                ClassAPI api = AppInstance.retrofit().create(ClassAPI.class);
+                Call<ServerResponse<ClassItem>> call = api.updateClass(item.id, ClassItem.newClass(
+                        name.getEditText().getText().toString(),
+                        tea.getSelectedItem().toString(),
+                        dept.getSelectedItem().toString()
+                ));
+                call.enqueue(new Callback<ServerResponse<ClassItem>>() {
+                    @Override
+                    public void onResponse(Call<ServerResponse<ClassItem>> call, Response<ServerResponse<ClassItem>> response)
+                    {
+                        ServerResponse<ClassItem> server = response.body();
+
+                        if(server != null && !server.hasError) {
+                            DialogUtil.successDialog(getContext(), "Update Successful", server.message, "Okay", false);
+                            close.callOnClick();
+                            onRefresh();
+                        }
+                        else if(server != null && server.hasError)
+                            DialogUtil.errorDialog(getContext(), "Update Failed", server.message, "Okay", false);
+                        else
+                            DialogUtil.errorDialog(getContext(), "Update Failed", "Server returned an unexpected result", "Okay", false);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ServerResponse<ClassItem>> call, Throwable t) {
+                        DialogUtil.errorDialog(getContext(), "Update Failed", t.getMessage(), "Okay", false);
+                    }
+                });
+            }
+        });
+
+        close.setOnClickListener(v -> {
+            editSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            name.getEditText().setText("");
+            name.getEditText().clearFocus();
+            name.setError("");
+
+            tea.setSelection(0);
+            dept.setSelection(0);
+
+            name.setEnabled(true);
+            dept.setEnabled(true);
+            tea.setEnabled(true);
+
+            curvedBottomNavigationView.setVisibility(View.VISIBLE);
+            fabAdd.setVisibility(View.VISIBLE);
+        });
+    }
+
+    private void viewClass(ClassItem item)
+    {
+        ArrayAdapter<String> teacherAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{item.teacher});
+        ArrayAdapter<String> deptAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{item.department});
+        TextInputLayout name = root.findViewById(R.id.input_classname);
+        AppCompatSpinner dept = root.findViewById(R.id.input_class_dept);
+        AppCompatSpinner tea = root.findViewById(R.id.input_class_teacher);
+        AppCompatButton edit = root.findViewById(R.id.btn_add_class);
+        AppCompatButton close = root.findViewById(R.id.btn_cancel);
+
+        name.setEnabled(false);
+        dept.setEnabled(false);
+        tea.setEnabled(false);
+
+        name.getEditText().setText(item.name);
+        dept.setAdapter(deptAdapter);
+        tea.setAdapter(teacherAdapter);
+        tea.setSelection(0);
+        dept.setSelection(0);
+
+        edit.setText("Edit Class");
+        close.setText("Close");
+
+        ConstraintLayout sheet = root.findViewById(R.id.sheet_edit);
+        BottomSheetBehavior<ConstraintLayout> addSheet = BottomSheetBehavior.from(sheet);
+        addSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
+        addSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        // Hide bottom nav and fab
+        curvedBottomNavigationView.setVisibility(View.GONE);
+        fabAdd.setVisibility(View.GONE);
+
+        edit.setOnClickListener(v -> {
+            close.callOnClick();
+            editClass(item);
+        });
+
+        close.setOnClickListener(v -> {
+            addSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            name.getEditText().setText("");
+            name.getEditText().clearFocus();
+            name.setError("");
+
+            tea.setSelection(0);
+            dept.setSelection(0);
+
+            name.setEnabled(true);
+            dept.setEnabled(true);
+            tea.setEnabled(true);
+
+            curvedBottomNavigationView.setVisibility(View.VISIBLE);
+            fabAdd.setVisibility(View.VISIBLE);
         });
     }
 
@@ -433,6 +604,44 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
             {
                 onRefresh();
                 return;
+            }
+
+            if(intent.getAction().equals(Constants.TRIGGER_MODAL_OPEN))
+            {
+                int action = intent.getExtras().getInt(Constants.KEY_TRIGGER_ACTION_TYPE);
+                int type = intent.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_TYPE);
+                int id = intent.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_VIEW);
+
+                if(type != 4)
+                    return;
+
+                DialogUtil.progressDialog(getContext(), "Loading class...", getContext().getResources().getColor(R.color.themeColor), false);
+                ClassAPI api = AppInstance.retrofit().create(ClassAPI.class);
+                Call<ServerResponse<ClassItem>> call = api.getClass(id);
+                call.enqueue(new Callback<ServerResponse<ClassItem>>() {
+                    @Override
+                    public void onResponse(Call<ServerResponse<ClassItem>> call, Response<ServerResponse<ClassItem>> response)
+                    {
+                        DialogUtil.dismissDialog();
+                        ServerResponse<ClassItem> server = response.body();
+
+                        if(server != null && !server.hasError)
+                        {
+                            List<ClassItem> items = server.data;
+
+                            if(items != null && action == 0)
+                                viewClass(items.get(0));
+                            else
+                                DialogUtil.errorDialog(context, "Error", server.message, "Okay", false);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ServerResponse<ClassItem>> call, Throwable t)
+                    {
+                        DialogUtil.errorDialog(context, "Server Error", t.getMessage(), false);
+                    }
+                });
             }
         }
     };

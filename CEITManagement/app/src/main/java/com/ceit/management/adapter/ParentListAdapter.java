@@ -12,6 +12,7 @@ import com.ceit.management.R;
 import com.ceit.management.adapter.holder.BaseViewHolder;
 import com.ceit.management.adapter.holder.ParentListHolder;
 import com.ceit.management.pojo.ParentItem;
+import com.chauthai.swipereveallayout.ViewBinderHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class ParentListAdapter extends RecyclerView.Adapter<BaseViewHolder> impl
 {
     private static final int VIEW_TYPE_NORMAL = 1;
 
+    private ViewBinderHelper binderHelper = new ViewBinderHelper();
     private List<ParentItem> parentItems;
     private List<ParentItem> copy;
 
@@ -28,6 +30,7 @@ public class ParentListAdapter extends RecyclerView.Adapter<BaseViewHolder> impl
         this.copy = new ArrayList<>();
         this.parentItems = parentItems;
         this.copy.addAll(parentItems);
+        this.binderHelper.setOpenOnlyOne(true);
     }
 
     @NonNull
@@ -40,7 +43,11 @@ public class ParentListAdapter extends RecyclerView.Adapter<BaseViewHolder> impl
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position)
     {
-        holder.onBind(position);
+        if(holder != null && 0 <= position && position < parentItems.size())
+        {
+            binderHelper.bind(((ParentListHolder) holder).swipeRevealLayout, parentItems.get(position).name + "_" + parentItems.get(position).id);
+            holder.onBind(position);
+        }
     }
 
     @Override

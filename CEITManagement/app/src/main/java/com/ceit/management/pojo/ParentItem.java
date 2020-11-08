@@ -3,6 +3,8 @@ package com.ceit.management.pojo;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class ParentItem
 {
     @SerializedName("id")
@@ -18,8 +20,16 @@ public class ParentItem
     public String gender;
 
     @SerializedName("child")
-    @Expose
+    @Expose(serialize = true, deserialize = false)
     public int[] child;
+
+    @SerializedName("removedChild")
+    @Expose(serialize = true, deserialize = false)
+    public int[] removedChild;
+
+    @SerializedName("selectedChild")
+    @Expose(serialize = false, deserialize = true)
+    public ArrayList<StudentItem> selectedChild;
 
     @SerializedName("religion")
     @Expose
@@ -33,7 +43,7 @@ public class ParentItem
     @Expose
     public String address;
 
-    @SerializedName("contactNumber")
+    @SerializedName("contact_number")
     @Expose
     public String contactNumber;
 
@@ -52,11 +62,12 @@ public class ParentItem
     private ParentItem()
     {}
 
-    private ParentItem(String name, String gender, int[] child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
+    private ParentItem(String name, String gender, int[] child, int[] removedChild,  String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
     {
         this.name = name;
         this.gender = gender;
         this.child = child;
+        this.removedChild = removedChild;
         this.religion = religion;
         this.birthday = birthday;
         this.address = address;
@@ -66,12 +77,13 @@ public class ParentItem
         this.photo = photo;
     }
 
-    private ParentItem(int id, String name, String gender, int[] child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
+    private ParentItem(int id, String name, String gender, int[] child, int[] removedChild, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
     {
         this.id = id;
         this.name = name;
         this.gender = gender;
         this.child = child;
+        this.removedChild = removedChild;
         this.religion = religion;
         this.birthday = birthday;
         this.address = address;
@@ -81,9 +93,9 @@ public class ParentItem
         this.photo = photo;
     }
 
-    public static synchronized ParentItem newParent(String name, String gender, int[] child, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
+    public static synchronized ParentItem newParent(String name, String gender, int[] child, int[] removedChild, String religion, String birthday, String address, String contactNumber, String email, String occupation, String photo)
     {
-        return new ParentItem(name, gender, child, religion, birthday, address, contactNumber, email, occupation, photo);
+        return new ParentItem(name, gender, child, removedChild, religion, birthday, address, contactNumber, email, occupation, photo);
     }
 
     public static synchronized ParentItem newParent()

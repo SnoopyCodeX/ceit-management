@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,7 +53,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,9 +62,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
+import io.michaelrocks.libphonenumber.android.PhoneNumberUtil;
 import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -76,21 +73,23 @@ import retrofit2.Response;
 public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener, InternetReceiver.OnInternetConnectionChangedListener {
     private WaveSwipeRefreshLayout refreshStudentListLayout;
     private CurvedBottomNavigationView curvedBottomNavigationView;
+    private NestedScrollView scroller;
     private FloatingActionButton fabAdd;
     private LinearLayout overlayNoWifi;
     private LinearLayout overlayNodataFound;
     private LinearLayout overlayServerError;
     private RecyclerView listStudents;
     private StudentListAdapter studentListAdapter;
-    private View root;
 
-    private boolean editMode = false;
+    private String base64Image;
+    private View root;
 
     @SuppressLint("NonConstantResourceId")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_students, container, false);
         refreshStudentListLayout = root.findViewById(R.id.refresh_students_list);
         curvedBottomNavigationView = root.findViewById(R.id.bottom_nav_students);
+        scroller = root.findViewById(R.id.scroller);
         fabAdd = root.findViewById(R.id.fab);
         overlayNoWifi = root.findViewById(R.id.no_wifi_layout);
         overlayNodataFound = root.findViewById(R.id.no_data_layout);
@@ -124,8 +123,8 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
             return false;
         });
 
-        fabAdd.setOnClickListener((View view) -> {
-
+        fabAdd.setOnClickListener(v -> {
+            showAddForm();
         });
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -168,24 +167,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
             ImageView cover = root.findViewById(R.id.e_background);
 
             Bitmap photo = ImageUtil.imageUriToBitmap(getContext(), data.getData());
-            String base64Image = ImageUtil.imageToBase64(photo);
-
-            AtomicInteger counter = new AtomicInteger(1);
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run()
-                {
-                    if(counter.getAndIncrement() <= 2)
-                        handler.postDelayed(this, 1000);
-
-                    BlurImage.with(getContext())
-                            .setBlurRadius(25f)
-                            .setBitmapScale(0.6f)
-                            .blur(photo)
-                            .into(cover);
-                }
-            }, 1000l);
+            base64Image = ImageUtil.imageToBase64(photo);
 
             profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
             profile.setImageBitmap(photo);
@@ -231,35 +213,35 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.VISIBLE);
-        listStudents.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void noDataFound() {
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.VISIBLE);
         overlayNoWifi.setVisibility(View.GONE);
-        listStudents.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void serverError() {
         overlayServerError.setVisibility(View.VISIBLE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listStudents.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void connectedToInternet() {
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listStudents.setVisibility(View.VISIBLE);
+        scroller.setVisibility(View.VISIBLE);
     }
 
     private void dataFound() {
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listStudents.setVisibility(View.VISIBLE);
+        scroller.setVisibility(View.VISIBLE);
     }
 
     private void fetchAllStudents() {
@@ -335,6 +317,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
     private void fetchAllClasses(String selectedClass)
     {
+        DialogUtil.progressDialog(getContext(), "Fetching registered classes..", getContext().getResources().getColor(R.color.themeColor), false);
         final Spinner section = root.findViewById(R.id.e_section);
 
         ClassAPI api = AppInstance.retrofit().create(ClassAPI.class);
@@ -344,6 +327,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
             public void onResponse(Call<ServerResponse<ClassItem>> call, Response<ServerResponse<ClassItem>> response)
             {
                 ServerResponse<ClassItem> server = response.body();
+                DialogUtil.dismissDialog();
 
                 if(server != null && !server.hasError && server.data.size() > 0)
                 {
@@ -413,14 +397,14 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         });
     }
 
-    private void updateStudent(StudentItem student)
+    private void editStudent(StudentItem student)
     {
         ShapeableImageView profile = root.findViewById(R.id.e_profile);
         ImageView cover = root.findViewById(R.id.e_background);
 
         ImageView changePhoto = root.findViewById(R.id.change_photo);
         Button close = root.findViewById(R.id.e_close);
-        Button saveCancel = root.findViewById(R.id.btn_save_cancel_profile);
+        Button save = root.findViewById(R.id.btn_save_cancel_profile);
 
         TextInputEditText name = root.findViewById(R.id.e_name);
         TextView birthday = root.findViewById(R.id.e_birthdate);
@@ -436,23 +420,6 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         //hide fab and bottom nav
         curvedBottomNavigationView.setVisibility(View.GONE);
         fabAdd.setVisibility(View.GONE);
-
-        AtomicInteger counter = new AtomicInteger(1);
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run()
-            {
-                if(counter.getAndIncrement() <= 2)
-                    handler.postDelayed(this, 1000);
-
-                BlurImage.with(getContext())
-                        .setBlurRadius(25f)
-                        .setBitmapScale(0.6f)
-                        .blurFromUri(student.photo)
-                        .into(cover);
-            }
-        }, 1000l);
 
         Glide.with(getContext())
                 .load(student.photo)
@@ -498,30 +465,6 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, genders);
         gender.setAdapter(genderAdapter);
         gender.setSelection(student.gender.toLowerCase().equals("male") ? 0 : 1);
-        gender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-             @Override
-             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-             {
-                 student.gender = genders[position];
-             }
-
-             @Override
-             public void onNothingSelected(AdapterView<?> parent)
-             {}
-        });
-
-        section.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-            {
-                String item = (String) parent.getAdapter().getItem(position);
-                student.section = item;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {}
-        });
 
         changePhoto.setOnClickListener(v -> {
             Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -530,14 +473,93 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         });
 
         close.setOnClickListener(v -> {
+            name.clearFocus();
+            email.clearFocus();
+            address.clearFocus();
+            religion.clearFocus();
+            number.clearFocus();
+
+            name.setText("");
+            email.setText("");
+            address.setText("");
+            religion.setText("");
+            number.setText("");
+
             editAddSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
 
             curvedBottomNavigationView.setVisibility(View.VISIBLE);
             fabAdd.setVisibility(View.VISIBLE);
         });
 
-        saveCancel.setOnClickListener(v -> {
+        save.setOnClickListener(v -> {
+            try {
+                DialogUtil.progressDialog(getContext(), "Updating student...", getContext().getResources().getColor(R.color.themeColor), false);
+                PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.createInstance(getContext());
 
+                String str_name = name.getText().toString();
+                String str_email = email.getText().toString();
+                String str_address = address.getText().toString();
+                String str_religion = religion.getText().toString();
+                String str_number = number.getText().toString();
+                String str_bday = birthday.getText().toString();
+                String str_gender = gender.getSelectedItem().toString();
+                String str_section = section.getSelectedItem().toString();
+
+                if(str_name.isEmpty() || !str_name.matches("([a-zA-Z\\.\\s]+)$") || !(str_name.length() >= 4))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid name", "Okay", false);
+                else if(str_bday.toLowerCase().equals("birth date"))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please set a valid birth date", "Okay", false);
+                else if(str_religion.isEmpty() || !str_religion.matches("([a-zA-Z\\-\\s]+)$") || !(str_religion.length() >= 4))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please add a valid religion", "Okay", false);
+                else if(str_email.isEmpty() || !str_email.matches("([a-zA-Z0-9\\-\\_\\.\\@]+)$"))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please add a valid email address", "Okay", false);
+                else if(str_number.isEmpty() || !phoneNumberUtil.isValidNumber(phoneNumberUtil.parse(str_number, "PH")))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid Philippine phone number", "Okay", false);
+                else if(str_address.isEmpty() || !(str_address.length() >= 5))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid address", "Okay", false);
+                else
+                {
+                    StudentAPI api = AppInstance.retrofit().create(StudentAPI.class);
+                    Call<ServerResponse<StudentItem>> call = api.updateStudent(student.id, StudentItem.newStudent(
+                            str_name,
+                            str_gender,
+                            str_email,
+                            "+63" + phoneNumberUtil.parse(str_number, "PH").getNationalNumber(),
+                            str_address,
+                            str_religion,
+                            str_bday,
+                            str_section,
+                            base64Image
+                    ));
+                    call.enqueue(new Callback<ServerResponse<StudentItem>>() {
+                        @Override
+                        public void onResponse(Call<ServerResponse<StudentItem>> call, Response<ServerResponse<StudentItem>> response)
+                        {
+                            DialogUtil.dismissDialog();
+                            ServerResponse<StudentItem> server = response.body();
+
+                            if(server != null && !server.hasError) {
+                                close.callOnClick();
+                                onRefresh();
+                                DialogUtil.successDialog(getContext(), "Success", server.message, "Okay", false);
+                            }
+                            else if(server != null && server.hasError)
+                                DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
+                            else
+                                DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+                        }
+
+                        @Override
+                        public void onFailure(Call<ServerResponse<StudentItem>> call, Throwable t)
+                        {
+                            DialogUtil.dismissDialog();
+                            DialogUtil.errorDialog(getContext(), "Error", t.getMessage(), "Okay", false);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         fetchAllClasses(student.section);
@@ -583,6 +605,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         number.setText(student.contactNumber);
         address.setText(student.address);
         religion.setText(student.religion);
+        section.setText(student.section);
 
         ConstraintLayout bottomViewSheet = root.findViewById(R.id.sheet_info);
         BottomSheetBehavior<ConstraintLayout> viewSheet = BottomSheetBehavior.from(bottomViewSheet);
@@ -590,7 +613,20 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         viewSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         close.setOnClickListener(v -> {
+            cover.setBackgroundColor(getContext().getResources().getColor(R.color.themeColor));
             viewSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            name.clearFocus();
+            email.clearFocus();
+            address.clearFocus();
+            religion.clearFocus();
+            number.clearFocus();
+
+            name.setText("");
+            email.setText("");
+            address.setText("");
+            religion.setText("");
+            number.setText("");
 
             curvedBottomNavigationView.setVisibility(View.VISIBLE);
             fabAdd.setVisibility(View.VISIBLE);
@@ -599,12 +635,157 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
         edit.setOnClickListener(v -> {
             viewSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-            Intent editBroadcast = new Intent(Constants.TRIGGER_MODAL_OPEN);
-            editBroadcast.putExtra(Constants.KEY_TRIGGER_MODAL_VIEW, student.id);
-            editBroadcast.putExtra(Constants.KEY_TRIGGER_MODAL_TYPE, 2);
-            editBroadcast.putExtra(Constants.KEY_TRIGGER_ACTION_TYPE, 1);
-            getContext().sendBroadcast(editBroadcast);
+            editStudent(student);
         });
+    }
+
+    private void showAddForm()
+    {
+        ShapeableImageView profile = root.findViewById(R.id.e_profile);
+        ImageView cover = root.findViewById(R.id.e_background);
+
+        ImageView changePhoto = root.findViewById(R.id.change_photo);
+        Button close = root.findViewById(R.id.e_close);
+        Button add = root.findViewById(R.id.btn_save_cancel_profile);
+
+        TextInputEditText name = root.findViewById(R.id.e_name);
+        TextView birthday = root.findViewById(R.id.e_birthdate);
+        Spinner gender = root.findViewById(R.id.e_gender);
+        TextInputEditText email = root.findViewById(R.id.e_email);
+        TextInputEditText number = root.findViewById(R.id.e_number);
+        TextInputEditText address = root.findViewById(R.id.e_address);
+        Spinner section = root.findViewById(R.id.e_section);
+        TextInputEditText religion = root.findViewById(R.id.e_religion);
+
+        profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
+
+        //hide fab and bottom nav
+        curvedBottomNavigationView.setVisibility(View.GONE);
+        fabAdd.setVisibility(View.GONE);
+
+        ConstraintLayout bottomEditAddSheet = root.findViewById(R.id.sheet_edit);
+        BottomSheetBehavior<ConstraintLayout> addSheet = BottomSheetBehavior.from(bottomEditAddSheet);
+        addSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
+        addSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        birthday.setOnClickListener(v -> {
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date("Jan 1, 1990"));
+            DatePickerDialog picker = new DatePickerDialog(getContext(), (view, year, month, date) -> {
+                Calendar newCalendar = Calendar.getInstance();
+                newCalendar.set(year, month, date);
+
+                String strBday = DateFormat.getDateInstance().format(newCalendar.getTime());
+                birthday.setText(strBday);
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+            picker.show();
+        });
+
+        String[] genders = {"Male", "Female"};
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, genders);
+        gender.setAdapter(genderAdapter);
+        gender.setSelection(0);
+
+        changePhoto.setOnClickListener(v -> {
+            Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickIntent.setType("image/*");
+            startActivityForResult(Intent.createChooser(pickIntent, "Choose image..."), Constants.CODE_PICK_IMAGE);
+        });
+
+        close.setOnClickListener(v -> {
+            name.clearFocus();
+            email.clearFocus();
+            address.clearFocus();
+            religion.clearFocus();
+            number.clearFocus();
+
+            name.setText("");
+            email.setText("");
+            address.setText("");
+            religion.setText("");
+            number.setText("");
+
+            addSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            curvedBottomNavigationView.setVisibility(View.VISIBLE);
+            fabAdd.setVisibility(View.VISIBLE);
+        });
+
+        add.setOnClickListener(v -> {
+            try {
+                DialogUtil.progressDialog(getContext(), "Adding student...", getContext().getResources().getColor(R.color.themeColor), false);
+                PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.createInstance(getContext());
+
+                String str_name = name.getText().toString();
+                String str_email = email.getText().toString();
+                String str_address = address.getText().toString();
+                String str_religion = religion.getText().toString();
+                String str_number = number.getText().toString();
+                String str_bday = birthday.getText().toString();
+                String str_gender = gender.getSelectedItem().toString();
+                String str_section = section.getSelectedItem().toString();
+
+                if(base64Image == null)
+                    DialogUtil.errorDialog(getContext(), "Error", "Please add an image", "Okay", false);
+                else if(str_name.isEmpty() || !str_name.matches("([a-zA-Z\\.\\s]+)$") || !(str_name.length() >= 4))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid name", "Okay", false);
+                else if(str_bday.toLowerCase().equals("birth date"))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please set a valid birth date", "Okay", false);
+                else if(str_religion.isEmpty() || !str_religion.matches("([a-zA-Z\\-\\s]+)$") || !(str_religion.length() >= 4))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please add a valid religion", "Okay", false);
+                else if(str_email.isEmpty() || !str_email.matches("([a-zA-Z0-9\\-\\_\\.\\@]+)$"))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please add a valid email address", "Okay", false);
+                else if(str_number.isEmpty() || !phoneNumberUtil.isValidNumber(phoneNumberUtil.parse(str_number, "PH")))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid Philippine phone number", "Okay", false);
+                else if(str_address.isEmpty() || !(str_address.length() >= 5))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid address", "Okay", false);
+                else
+                {
+                    StudentAPI api = AppInstance.retrofit().create(StudentAPI.class);
+                    Call<ServerResponse<StudentItem>> call = api.addNewStudent(StudentItem.newStudent(
+                            str_name,
+                            str_gender,
+                            str_email,
+                            "+63" + phoneNumberUtil.parse(str_number, "PH").getNationalNumber(),
+                            str_address,
+                            str_religion,
+                            str_bday,
+                            str_section,
+                            base64Image
+                    ));
+                    call.enqueue(new Callback<ServerResponse<StudentItem>>() {
+                        @Override
+                        public void onResponse(Call<ServerResponse<StudentItem>> call, Response<ServerResponse<StudentItem>> response)
+                        {
+                            DialogUtil.dismissDialog();
+                            ServerResponse<StudentItem> server = response.body();
+
+                            if(server != null && !server.hasError) {
+                                close.callOnClick();
+                                onRefresh();
+                                DialogUtil.successDialog(getContext(), "Success", server.message, "Okay", false);
+                            }
+                            else if(server != null && server.hasError)
+                                DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
+                            else
+                                DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+                        }
+
+                        @Override
+                        public void onFailure(Call<ServerResponse<StudentItem>> call, Throwable t)
+                        {
+                            DialogUtil.dismissDialog();
+                            DialogUtil.errorDialog(getContext(), "Error", t.getMessage(), "Okay", false);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        fetchAllClasses("");
     }
 
     private final BroadcastReceiver modalViewPersonTriggerReceiver = new BroadcastReceiver() {
@@ -645,12 +826,8 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
 
                         if(studentItems != null && modalAction == 0)
                             viewStudent(studentItems.get(0));
-                        else if(studentItems != null && modalAction == 1)
-                            updateStudent(studentItems.get(0));
-                        else if(studentItems != null &&  modalAction == 2)
-                        {}
                         else
-                            DialogUtil.errorDialog(context, server.message, "Okay");
+                            DialogUtil.errorDialog(context, "Error", server.message, "Okay", false);
                     }
                 }
 

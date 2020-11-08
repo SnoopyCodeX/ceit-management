@@ -78,4 +78,12 @@
     <string name="hint_enter_child_s_name">Enter child\'s name</string>
     <string name="header_child">Child</string>
     <string name="hint_full_name">Full name</string>
+    <string name="header_rank">Rank</string>
+    <string name="hint_rank">Rank (eg: Teacher 2)</string>
+    <string name="btn_add_teacher">Add Teacher</string>
+    <string name="btn_update_credentials">Update Credentials</string>
+    <string name="hint_old_admin_username">Old Admin Username</string>
+    <string name="hint_old_admin_password">Old Admin Password</string>
+    <string name="hint_new_admin_password">New Admin Password</string>
+    <string name="hint_new_admin_username">New Admin Username</string>
 </resources>

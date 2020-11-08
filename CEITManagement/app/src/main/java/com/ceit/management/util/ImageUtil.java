@@ -2,12 +2,13 @@ package com.ceit.management.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ImageUtil
 {
@@ -22,7 +23,8 @@ public class ImageUtil
     public static Bitmap imageUriToBitmap(Context context, Uri uri)
     {
         try {
-            return MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+            InputStream is = context.getContentResolver().openInputStream(uri);
+            return BitmapFactory.decodeStream(is, null, null);
         } catch(IOException e) {
             e.printStackTrace();
         }

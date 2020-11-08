@@ -5,8 +5,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class TeacherItem
 {
-    @SerializedName("name")
+    @SerializedName("id")
     @Expose(serialize = false, deserialize = true)
+    public int id;
+
+    @SerializedName("name")
+    @Expose
     public String name;
 
     @SerializedName("rank")
@@ -21,7 +25,7 @@ public class TeacherItem
     @Expose
     public String email;
 
-    @SerializedName("contactNumber")
+    @SerializedName("contact_number")
     @Expose
     public String contactNumber;
 

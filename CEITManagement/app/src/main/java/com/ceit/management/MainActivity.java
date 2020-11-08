@@ -5,16 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.ceit.management.util.Constants;
+import com.ceit.management.util.DialogUtil;
 import com.ceit.management.util.PreferenceUtil;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -24,6 +22,9 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -57,9 +58,15 @@ public class MainActivity extends AppCompatActivity
         dashboardClickObserver = new DashboardClickObserver();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener((MenuItem item) -> {
-            PreferenceUtil.getPreference().edit().clear().apply();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+            DialogUtil.warningDialog(this, "Confirm Logout", "Are you sure you want to logout?", "Yes", "No",
+                    (dlg) -> {
+                        DialogUtil.progressDialog(this, "Logging out...", getResources().getColor(R.color.themeColor), false);
+
+                        PreferenceUtil.getPreference().edit().clear().apply();
+                        startActivity(new Intent(this, LoginActivity.class));
+                        finish();
+                    },
+                    SweetAlertDialog::dismissWithAnimation, false);
 
             return true;
         });

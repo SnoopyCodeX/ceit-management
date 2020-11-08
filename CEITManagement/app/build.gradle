@@ -3,6 +3,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        'ceit-management' {
+            storeFile file('C:\\Users\\Lotus\\Documents\\GitHub\\ceit-management\\CEITManagement\\ceit-management.jks')
+            storePassword var
+            keyAlias 'ceit-management'
+            keyPassword var
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
@@ -20,7 +28,10 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.'ceit-management'
+            multiDexEnabled true
         }
     }
     compileOptions {
@@ -54,10 +65,10 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.6'
+    implementation 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.6'
 
-    implementation "com.jakewharton:butterknife:10.1.0"
-    annotationProcessor "com.jakewharton:butterknife-compiler:10.1.0"
+    implementation 'com.jakewharton:butterknife:10.2.3'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
 
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

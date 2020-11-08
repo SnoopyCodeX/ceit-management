@@ -29,6 +29,7 @@ import com.ceit.management.util.DialogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("All")
 public class LoginActivity extends AppCompatActivity implements OnInternetConnectionChangedListener
 {
     private TextInputLayout inputUsername, inputPassword;

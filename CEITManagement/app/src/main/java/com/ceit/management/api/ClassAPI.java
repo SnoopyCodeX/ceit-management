@@ -1,5 +1,7 @@
 package com.ceit.management.api;
 
+import androidx.annotation.Keep;
+
 import com.ceit.management.model.ServerResponse;
 import com.ceit.management.pojo.ClassItem;
 
@@ -9,6 +11,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
+@Keep
 public interface ClassAPI
 {
     @GET("classes")

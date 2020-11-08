@@ -28,10 +28,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.ceit.management.AppInstance;
 import com.ceit.management.R;
 import com.ceit.management.adapter.ChildListAdapter;
@@ -40,9 +43,11 @@ import com.ceit.management.adapter.SelectedChildAdapter;
 import com.ceit.management.api.ParentAPI;
 import com.ceit.management.api.StudentAPI;
 import com.ceit.management.model.ServerResponse;
+import com.ceit.management.net.BlurImage;
 import com.ceit.management.net.InternetReceiver;
 import com.ceit.management.pojo.ParentItem;
 import com.ceit.management.pojo.StudentItem;
+import com.ceit.management.pojo.TeacherItem;
 import com.ceit.management.util.Constants;
 import com.ceit.management.util.DialogUtil;
 import com.ceit.management.util.ImageUtil;
@@ -74,6 +79,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
 {
     private WaveSwipeRefreshLayout refreshParentListLayout;
     private CurvedBottomNavigationView curvedBottomNavigationView;
+    private NestedScrollView scroller;
     private FloatingActionButton fabAdd;
     private LinearLayout overlayNoWifi;
     private LinearLayout overlayNodataFound;
@@ -92,6 +98,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         root = inflater.inflate(R.layout.fragment_parents, container, false);
         refreshParentListLayout = root.findViewById(R.id.refresh_parents_list);
         curvedBottomNavigationView = root.findViewById(R.id.bottom_nav_parents);
+        scroller = root.findViewById(R.id.scroller);
         fabAdd = root.findViewById(R.id.fab);
         overlayNoWifi = root.findViewById(R.id.no_wifi_layout);
         overlayNodataFound = root.findViewById(R.id.no_data_layout);
@@ -136,6 +143,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         parentListAdapter = new ParentListAdapter(new ArrayList<>());
         listParents.setAdapter(parentListAdapter);
 
+        refreshParentListLayout.setRefreshing(true);
         fetchAllParents();
 
         setHasOptionsMenu(true);
@@ -178,6 +186,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.TRIGGER_REFRESH_LIST);
+        filter.addAction(Constants.TRIGGER_MODAL_OPEN);
         getContext().registerReceiver(receiver, filter);
     }
 
@@ -226,7 +235,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.VISIBLE);
-        listParents.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void noDataFound()
@@ -234,7 +243,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.VISIBLE);
         overlayNoWifi.setVisibility(View.GONE);
-        listParents.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void serverError()
@@ -242,7 +251,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         overlayServerError.setVisibility(View.VISIBLE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listParents.setVisibility(View.GONE);
+        scroller.setVisibility(View.GONE);
     }
 
     private void connectedToInternet()
@@ -250,7 +259,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         overlayServerError.setVisibility(View.VISIBLE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listParents.setVisibility(View.VISIBLE);
+        scroller.setVisibility(View.VISIBLE);
     }
 
     private void dataFound()
@@ -258,7 +267,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         overlayServerError.setVisibility(View.GONE);
         overlayNodataFound.setVisibility(View.GONE);
         overlayNoWifi.setVisibility(View.GONE);
-        listParents.setVisibility(View.VISIBLE);
+        scroller.setVisibility(View.VISIBLE);
     }
 
     private void fetchAllParents()
@@ -378,14 +387,25 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                     if(!selectedItems.isEmpty() && !unselectedItems.isEmpty())
                     {
                         for(StudentItem selected : selectedItems)
-                            for(StudentItem unselected : unselectedItems)
-                                if(selected.name.toLowerCase().equals(unselected.name.toLowerCase()))
+                            for(int i = 0; i < unselectedItems.size(); i++)
+                            {
+                                StudentItem unselected = unselectedItems.get(i);
+                                if (selected.name.toLowerCase().equals(unselected.name.toLowerCase()))
                                     unselectedItems.remove(unselected);
-                                else
-                                    unselectedItems.add(unselected);
+                            }
 
-                        childListAdapter = new ChildListAdapter(getContext(), unselectedItems);
-                        child.setAdapter(childListAdapter);
+                        if(childListAdapter != null)
+                        {
+                            childListAdapter.clear();
+
+                            for(StudentItem item : unselectedItems)
+                                childListAdapter.add(item);
+                        }
+                        else
+                        {
+                            childListAdapter = new ChildListAdapter(getContext(), unselectedItems);
+                            child.setAdapter(childListAdapter);
+                        }
                     }
                     else if(selectedItems.isEmpty() && !unselectedItems.isEmpty())
                     {
@@ -397,11 +417,12 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
 
             @Override
             public void onFailure(Call<ServerResponse<StudentItem>> call, Throwable t)
-            {}
+            {
+                DialogUtil.errorDialog(getContext(), "Preparing Failed", t.getMessage(), "Okay", false);
+            }
         });
     }
 
-    @SuppressLint("IntentReset")
     private void showAddParent()
     {
         TextInputEditText name = root.findViewById(R.id.e_name);
@@ -415,6 +436,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         Button add = root.findViewById(R.id.btn_save_cancel_profile);
         Button close = root.findViewById(R.id.e_close);
         ShapeableImageView profile = root.findViewById(R.id.e_profile);
+        ImageView cover = root.findViewById(R.id.e_background);
         ImageView change = root.findViewById(R.id.change_photo);
         Spinner gender = root.findViewById(R.id.e_gender);
         TextView birthday = root.findViewById(R.id.e_birthdate);
@@ -423,6 +445,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
 
         profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
         profile.setImageResource(R.drawable.parents);
+        cover.setBackgroundColor(getContext().getResources().getColor(R.color.themeColor));
 
         String[] genders = {"Male", "Female"};
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, genders);
@@ -463,7 +486,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
             selectedChild.setVisibility(View.GONE);
             fetchAllUnselectedStudents();
         });
-        selectedChildAdapter.setOnItemsChangedListener(() -> {
+        selectedChildAdapter.setOnItemsChangedListener((id, type) -> {
             fetchAllUnselectedStudents();
         });
         selectedChild.setAdapter(selectedChildAdapter);
@@ -479,6 +502,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         });
 
         close.setOnClickListener(v -> {
+            selectedChildAdapter = null;
             name.clearFocus();
             religion.clearFocus();
             email.clearFocus();
@@ -515,7 +539,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
 
                 String str_name = name.getText().toString();
                 String str_religion = religion.getText().toString();
-                String str_email = religion.getText().toString();
+                String str_email = email.getText().toString();
                 String str_number = number.getText().toString();
                 String str_address = address.getText().toString();
                 String str_occupation = occupation.getText().toString();
@@ -546,10 +570,11 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                             str_name,
                             str_gender,
                             selectedChildAdapter.getStudentIds(),
+                            new int[0],
                             str_religion,
                             str_bday,
                             str_address,
-                            phoneNumberUtil.parse(str_number, "PH").toString(),
+                            "+63" + String.valueOf(phoneNumberUtil.parse(str_number, "PH").getNationalNumber()),
                             str_email,
                             str_occupation,
                             base64Image
@@ -561,8 +586,11 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                             DialogUtil.dismissDialog();
                             ServerResponse<ParentItem> server = response.body();
 
-                            if(server != null && !server.hasError)
+                            if(server != null && !server.hasError) {
+                                close.callOnClick();
+                                onRefresh();
                                 DialogUtil.successDialog(getContext(), "Success", server.message, "Okay", false);
+                            }
                             else if(server != null && server.hasError)
                                 DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
                             else
@@ -585,6 +613,394 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
         });
     }
 
+    private void viewParent(ParentItem item)
+    {
+        TextInputEditText name = root.findViewById(R.id.e_name);
+        TextInputEditText religion = root.findViewById(R.id.e_religion);
+        TextInputEditText email = root.findViewById(R.id.e_email);
+        TextInputEditText number = root.findViewById(R.id.e_number);
+        TextInputEditText address = root.findViewById(R.id.e_address);
+        TextInputEditText occupation = root.findViewById(R.id.e_occupation);
+        MaterialAutoCompleteTextView child = root.findViewById(R.id.input_child);
+        ListView selectedChild = root.findViewById(R.id.selected_child);
+        Button edit = root.findViewById(R.id.btn_save_cancel_profile);
+        Button close = root.findViewById(R.id.e_close);
+        ShapeableImageView profile = root.findViewById(R.id.e_profile);
+        ImageView cover =  root.findViewById(R.id.e_background);
+        ImageView change = root.findViewById(R.id.change_photo);
+        ImageView iconChild = root.findViewById(R.id.icon_child);
+        Spinner gender = root.findViewById(R.id.e_gender);
+        TextView birthday = root.findViewById(R.id.e_birthdate);
+        TextView noChildSelected = root.findViewById(R.id.no_child);
+
+        profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
+        profile.setImageResource(R.drawable.parents);
+
+        BlurImage.with(getContext())
+                .setBlurRadius(25f)
+                .setBitmapScale(0.6f)
+                .blurFromUri(item.photo)
+                .into(cover);
+
+        Glide.with(getContext())
+                .load(item.photo)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(R.drawable.student)
+                .error(R.drawable.student)
+                .into(profile);
+
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{"Male", "Female"});
+        gender.setAdapter(genderAdapter);
+        gender.setSelection(item.gender.equals("Male") ? 0 : 1);
+
+        edit.setText("Edit Parent");
+
+        ArrayList<StudentItem> students = new ArrayList<>();
+        ArrayList<StudentItem> selected = (item.selectedChild == null) ? new ArrayList<>() : item.selectedChild;
+        for(int i = 0; i < selected.size(); i++)
+            students.add(selected.get(i));
+
+        if(selectedChildAdapter == null)
+            selectedChildAdapter = new SelectedChildAdapter(getContext(), students);
+        selectedChildAdapter.setEditMode(false);
+
+        if(selected.size() > 0)
+        {
+            noChildSelected.setVisibility(View.GONE);
+            selectedChild.setVisibility(View.VISIBLE);
+            selectedChild.setAdapter(selectedChildAdapter);
+        }
+        else
+        {
+            noChildSelected.setVisibility(View.VISIBLE);
+            selectedChild.setVisibility(View.GONE);
+        }
+
+        name.setText(item.name);
+        religion.setText(item.religion);
+        email.setText(item.email);
+        number.setText(item.contactNumber);
+        address.setText(item.address);
+        occupation.setText(item.occupation);
+        birthday.setText(item.birthday);
+
+        change.setVisibility(View.GONE);
+        name.setEnabled(false);
+        religion.setEnabled(false);
+        email.setEnabled(false);
+        number.setEnabled(false);
+        address.setEnabled(false);
+        occupation.setEnabled(false);
+        birthday.setEnabled(false);
+        gender.setEnabled(false);
+
+        // Hide fab and bottom nav
+        fabAdd.setVisibility(View.GONE);
+        curvedBottomNavigationView.setVisibility(View.GONE);
+
+        // Show child input and icon
+        ((ViewGroup) child.getParent()).setVisibility(View.GONE);
+
+        ConstraintLayout sheet = root.findViewById(R.id.sheet_add_edit);
+        BottomSheetBehavior<ConstraintLayout> editSheet = BottomSheetBehavior.from(sheet);
+        editSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
+        editSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        edit.setOnClickListener(v -> {
+            close.callOnClick();
+            if(selectedChildAdapter != null)
+                selectedChildAdapter.clear();
+            selectedChildAdapter = null;
+            editProfile(item);
+        });
+
+        close.setOnClickListener(v -> {
+            editSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+            name.setText("");
+            religion.setText("");
+            email.setText("");
+            number.setText("");
+            address.setText("");
+            occupation.setText("");
+            birthday.setText("Birth Date");
+
+            change.setVisibility(View.VISIBLE);
+            selectedChildAdapter.setEditMode(false);
+            selectedChildAdapter = null;
+            name.setEnabled(true);
+            religion.setEnabled(true);
+            email.setEnabled(true);
+            number.setEnabled(true);
+            address.setEnabled(true);
+            occupation.setEnabled(true);
+            birthday.setEnabled(true);
+            gender.setEnabled(true);
+
+            // Hide fab and bottom nav
+            fabAdd.setVisibility(View.VISIBLE);
+            curvedBottomNavigationView.setVisibility(View.VISIBLE);
+
+            // Hide child input and icon
+            child.setVisibility(View.VISIBLE);
+            iconChild.setVisibility(View.VISIBLE);
+        });
+    }
+
+    private void editProfile(ParentItem item)
+    {
+        TextInputEditText name = root.findViewById(R.id.e_name);
+        TextInputEditText religion = root.findViewById(R.id.e_religion);
+        TextInputEditText email = root.findViewById(R.id.e_email);
+        TextInputEditText number = root.findViewById(R.id.e_number);
+        TextInputEditText address = root.findViewById(R.id.e_address);
+        TextInputEditText occupation = root.findViewById(R.id.e_occupation);
+        MaterialAutoCompleteTextView child = root.findViewById(R.id.input_child);
+        ListView selectedChild = root.findViewById(R.id.selected_child);
+        Button save = root.findViewById(R.id.btn_save_cancel_profile);
+        Button close = root.findViewById(R.id.e_close);
+        ShapeableImageView profile = root.findViewById(R.id.e_profile);
+        ImageView cover =  root.findViewById(R.id.e_background);
+        ImageView change = root.findViewById(R.id.change_photo);
+        ImageView iconChild = root.findViewById(R.id.icon_child);
+        Spinner gender = root.findViewById(R.id.e_gender);
+        TextView birthday = root.findViewById(R.id.e_birthdate);
+        TextView noChildSelected = root.findViewById(R.id.no_child);
+        List<Integer> removedChild = new ArrayList<>();
+        fetchAllUnselectedStudents();
+
+        profile.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCorners(CornerFamily.ROUNDED, 160).build());
+        profile.setImageResource(R.drawable.parents);
+
+        BlurImage.with(getContext())
+                .setBlurRadius(25f)
+                .setBitmapScale(0.6f)
+                .blurFromUri(item.photo)
+                .into(cover);
+
+        Glide.with(getContext())
+                .load(item.photo)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(R.drawable.student)
+                .error(R.drawable.student)
+                .into(profile);
+
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{"Male", "Female"});
+        gender.setAdapter(genderAdapter);
+        gender.setSelection(item.gender.equals("Male") ? 0 : 1);
+
+        save.setText("Save Parent");
+
+        name.setText(item.name);
+        religion.setText(item.religion);
+        email.setText(item.email);
+        number.setText(item.contactNumber);
+        address.setText(item.address);
+        occupation.setText(item.occupation);
+        birthday.setText(item.birthday);
+
+        change.setVisibility(View.VISIBLE);
+        name.setEnabled(true);
+        religion.setEnabled(true);
+        email.setEnabled(true);
+        number.setEnabled(true);
+        address.setEnabled(true);
+        occupation.setEnabled(true);
+        birthday.setEnabled(true);
+        gender.setEnabled(true);
+
+        // Hide fab and bottom nav
+        fabAdd.setVisibility(View.GONE);
+        curvedBottomNavigationView.setVisibility(View.GONE);
+
+        // Show child input and icon
+        ((ViewGroup) child.getParent()).setVisibility(View.VISIBLE);
+
+        ConstraintLayout sheet = root.findViewById(R.id.sheet_add_edit);
+        BottomSheetBehavior<ConstraintLayout> editSheet = BottomSheetBehavior.from(sheet);
+        editSheet.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO, true);
+        editSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        birthday.setOnClickListener(v -> {
+            final Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date("Jan 1, 1950"));
+            DatePickerDialog picker = new DatePickerDialog(getContext(), (view, year, month, date) -> {
+                Calendar newCalendar = Calendar.getInstance();
+                newCalendar.set(year, month, date);
+
+                String strBday = DateFormat.getDateInstance().format(newCalendar.getTime());
+                birthday.setText(strBday);
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            picker.show();
+        });
+
+        change.setOnClickListener(v -> {
+            Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickIntent.setType("image/*");
+            startActivityForResult(Intent.createChooser(pickIntent, "Choose image..."), Constants.CODE_PICK_IMAGE);
+        });
+
+
+        ArrayList<StudentItem> students = new ArrayList<>();
+        ArrayList<StudentItem> selected = (item.selectedChild == null) ? new ArrayList<>() : item.selectedChild;
+        for(int i = 0; i < selected.size(); i++)
+            students.add(selected.get(i));
+
+        if(selectedChildAdapter == null)
+            selectedChildAdapter = new SelectedChildAdapter(getContext(), students);
+        selectedChildAdapter.setEditMode(true);
+
+        if(selected.size() > 0)
+        {
+            noChildSelected.setVisibility(View.GONE);
+            selectedChild.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            noChildSelected.setVisibility(View.VISIBLE);
+            selectedChild.setVisibility(View.GONE);
+        }
+
+        selectedChildAdapter.setOnListEmptyListener(() -> {
+            noChildSelected.setVisibility(View.VISIBLE);
+            selectedChild.setVisibility(View.GONE);
+            fetchAllUnselectedStudents();
+        });
+        selectedChildAdapter.setOnItemsChangedListener((id, type) -> {
+            fetchAllUnselectedStudents();
+
+            if(type == -1)
+                removedChild.add(Integer.valueOf(id));
+            else
+                removedChild.remove(Integer.valueOf(id));
+        });
+        selectedChild.setAdapter(selectedChildAdapter);
+
+        child.setOnItemClickListener((adapterView, view, position, id) -> {
+            StudentItem student = (StudentItem) adapterView.getItemAtPosition(position);
+            selectedChildAdapter.add(student);
+            child.setText("");
+
+            noChildSelected.setVisibility(View.GONE);
+            selectedChild.setVisibility(View.VISIBLE);
+            fetchAllUnselectedStudents();
+        });
+
+        save.setOnClickListener(v -> {
+            try {
+                DialogUtil.progressDialog(getContext(), "Updating parent...", getContext().getResources().getColor(R.color.themeColor), false);
+                PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.createInstance(getContext());
+
+                String str_name = name.getText().toString();
+                String str_religion = religion.getText().toString();
+                String str_email = email.getText().toString();
+                String str_number = number.getText().toString();
+                String str_address = address.getText().toString();
+                String str_occupation = occupation.getText().toString();
+
+                String str_bday = birthday.getText().toString();
+                String str_gender = gender.getSelectedItem().toString();
+
+                if(str_name.isEmpty() || !str_name.matches("([a-zA-Z\\.\\s]+)$") || !(str_name.length() >= 4))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid name", "Okay", false);
+                else if(str_bday.toLowerCase().equals("birth date"))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please set a valid birth date", "Okay", false);
+                else if(str_religion.isEmpty() || !str_religion.matches("([a-zA-Z\\-\\s]+)$") || !(str_religion.length() >= 4))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please add a valid religion", "Okay", false);
+                else if(str_email.isEmpty() || !str_email.matches("([a-zA-Z0-9\\-\\_\\.\\@]+)$"))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please add a valid email address", "Okay", false);
+                else if(str_number.isEmpty() || !phoneNumberUtil.isValidNumber(phoneNumberUtil.parse(str_number, "PH")))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid Philippine phone number", "Okay", false);
+                else if(str_address.isEmpty() || !(str_address.length() >= 5))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid address", "Okay", false);
+                else if(str_occupation.isEmpty() || !(str_occupation.length() >= 4))
+                    DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid occupation", "Okay", false);
+                else
+                {
+                    int[] removed = new int[removedChild.size()];
+
+                    for(int i = 0; i < removedChild.size(); i++)
+                        removed[i] = removedChild.get(i).intValue();
+
+                    ParentAPI api = AppInstance.retrofit().create(ParentAPI.class);
+                    Call<ServerResponse<ParentItem>> call = api.updateParent(item.id, ParentItem.newParent(
+                            str_name,
+                            str_gender,
+                            selectedChildAdapter.getStudentIds(),
+                            removed,
+                            str_religion,
+                            str_bday,
+                            str_address,
+                            "+63" + String.valueOf(phoneNumberUtil.parse(str_number, "PH").getNationalNumber()),
+                            str_email,
+                            str_occupation,
+                            base64Image
+                    ));
+                    call.enqueue(new Callback<ServerResponse<ParentItem>>() {
+                        @Override
+                        public void onResponse(Call<ServerResponse<ParentItem>> call, Response<ServerResponse<ParentItem>> response)
+                        {
+                            DialogUtil.dismissDialog();
+                            ServerResponse<ParentItem> server = response.body();
+
+                            if(server != null && !server.hasError) {
+                                close.callOnClick();
+                                onRefresh();
+                                DialogUtil.successDialog(getContext(), "Success", server.message, "Okay", false);
+                            }
+                            else if(server != null && server.hasError)
+                                DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
+                            else
+                                DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+                        }
+
+                        @Override
+                        public void onFailure(Call<ServerResponse<ParentItem>> call, Throwable t)
+                        {
+                            DialogUtil.dismissDialog();
+                            DialogUtil.errorDialog(getContext(), "Error", t.getLocalizedMessage(), "Okay", false);
+                        }
+                    });
+                }
+
+            } catch(Exception e) {
+                DialogUtil.errorDialog(getContext(), "Error", e.getMessage(), "Okay", false);
+                e.printStackTrace();
+            }
+        });
+
+        close.setOnClickListener(v -> {
+            name.setText("");
+            religion.setText("");
+            email.setText("");
+            number.setText("");
+            address.setText("");
+            occupation.setText("");
+            birthday.setText("Birth Date");
+
+            change.setVisibility(View.GONE);
+            selectedChildAdapter.setEditMode(false);
+            selectedChildAdapter = null;
+            name.setEnabled(true);
+            religion.setEnabled(true);
+            email.setEnabled(true);
+            number.setEnabled(true);
+            address.setEnabled(true);
+            occupation.setEnabled(true);
+            birthday.setEnabled(true);
+            gender.setEnabled(true);
+
+            // Hide fab and bottom nav
+            fabAdd.setVisibility(View.VISIBLE);
+            curvedBottomNavigationView.setVisibility(View.VISIBLE);
+
+            // Hide child input and icon
+            child.setVisibility(View.VISIBLE);
+            iconChild.setVisibility(View.VISIBLE);
+
+            editSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+        });
+    }
+
     private final BroadcastReceiver receiver = new BroadcastReceiver()
     {
         @Override
@@ -594,6 +1010,47 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
             {
                 onRefresh();
                 return;
+            }
+
+            if(intent.getAction().equals(Constants.TRIGGER_MODAL_OPEN))
+            {
+                int type = intent.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_TYPE);
+                int id = intent.getExtras().getInt(Constants.KEY_TRIGGER_MODAL_VIEW);
+                int action = intent.getExtras().getInt(Constants.KEY_TRIGGER_ACTION_TYPE);
+
+                if(type != 3)
+                    return;
+
+                DialogUtil.progressDialog(getContext(), "Viewing parent...", getContext().getResources().getColor(R.color.themeColor), false);
+                ParentAPI api = AppInstance.retrofit().create(ParentAPI.class);
+                Call<ServerResponse<ParentItem>> call = api.getParent(id);
+                call.enqueue(new Callback<ServerResponse<ParentItem>>() {
+                    @Override
+                    public void onResponse(Call<ServerResponse<ParentItem>> call, Response<ServerResponse<ParentItem>> response)
+                    {
+                        DialogUtil.dismissDialog();
+                        ServerResponse<ParentItem> server = response.body();
+
+                        if(server != null && !server.hasError)
+                        {
+                            List<ParentItem> items = server.data;
+
+                            if(action == 0)
+                                viewParent(items.get(0));
+                        }
+                        else if(server != null && server.hasError)
+                            DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
+                        else
+                            DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ServerResponse<ParentItem>> call, Throwable t)
+                    {
+                        DialogUtil.dismissDialog();
+                        DialogUtil.errorDialog(getContext(), "Error", t.getMessage(), "Okay", false);
+                    }
+                });
             }
         }
     };

@@ -127,10 +127,10 @@ public class ClassListHolder extends BaseViewHolder
         });
 
         deleteLayout.setOnClickListener(v -> {
-            DialogUtil.warningDialog(itemView.getContext(), Constants.DELETE_CLASS_TAB_ACTIVE ? "Permanent Delete" : "Confirm Delete", Constants.DELETE_CLASS_TAB_ACTIVE ? "Delete? This action cannot be reverted" : "Are you sure you want to delete this?", "Yes", "No",
+            DialogUtil.warningDialog(itemView.getContext(), Constants.DELETE_CLASS_TAB_ACTIVE ? "Permanent Delete" : "Confirm Delete", Constants.DELETE_CLASS_TAB_ACTIVE ? "Permanently delete? This action cannot be reverted" : "Are you sure you want to delete this?", "Yes", "No",
                     (dlg) -> {
                         dlg.dismissWithAnimation();
-                        DialogUtil.progressDialog(itemView.getContext(), "Deleting student...", itemView.getContext().getResources().getColor(R.color.themeColor), false);
+                        DialogUtil.progressDialog(itemView.getContext(), "Deleting class...", itemView.getContext().getResources().getColor(R.color.themeColor), false);
                         ClassAPI api = AppInstance.retrofit().create(ClassAPI.class);
                         Call<ServerResponse<ClassItem>> call = Constants.DELETE_CLASS_TAB_ACTIVE ? api.permanentDeleteClass(item.id) : api.deleteClass(item.id);
                         call.enqueue(new Callback<ServerResponse<ClassItem>>() {

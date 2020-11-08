@@ -30,6 +30,7 @@ public class StudentListAdapter extends RecyclerView.Adapter<BaseViewHolder> imp
         this.copy = new ArrayList<>();
         this.studentItems = studentItems;
         this.copy.addAll(studentItems);
+        this.binderHelper.setOpenOnlyOne(true);
     }
 
     @NonNull

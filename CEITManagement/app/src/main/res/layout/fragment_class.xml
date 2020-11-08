@@ -7,20 +7,26 @@
     android:layout_height="match_parent"
     tools:context=".ui.ClassFragment">
 
-    <LinearLayout
+    <include
+        layout="@layout/bs_class_edit_add"/>
+
+    <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
+        android:id="@+id/refresh_classes_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_marginBottom="80dp">
 
-        <jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout
-            android:id="@+id/refresh_classes_list"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
 
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scroller"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:scrollbars="none">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/list_classes"
@@ -28,26 +34,23 @@
                     android:layout_height="match_parent"
                     android:visibility="visible"/>
 
-                <include
-                    android:id="@+id/no_data_layout"
-                    android:visibility="gone"
-                    layout="@layout/overlay_notice_nodatafound"/>
+            </androidx.core.widget.NestedScrollView>
 
-                <include
-                    android:id="@+id/no_wifi_layout"
-                    android:visibility="gone"
-                    layout="@layout/overlay_notice_nowifi"/>
+            <include
+                android:id="@+id/no_data_layout"
+                layout="@layout/overlay_notice_nodatafound"/>
 
-                <include
-                    android:id="@+id/server_error_layout"
-                    android:visibility="gone"
-                    layout="@layout/overlay_notice_servererror"/>
+            <include
+                android:id="@+id/no_wifi_layout"
+                layout="@layout/overlay_notice_nowifi"/>
 
-            </LinearLayout>
+            <include
+                android:id="@+id/server_error_layout"
+                layout="@layout/overlay_notice_servererror"/>
 
-        </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
+        </LinearLayout>
 
-    </LinearLayout>
+    </jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -59,7 +62,7 @@
         android:focusable="true"
         android:contentDescription="@string/bot_nav_hidden_text"
         android:src="@android:drawable/ic_input_add"
-        android:tint="@color/white"
+        app:tint="@color/white"
         app:elevation="10dp"
         app:backgroundTint="@color/themeColor"/>
 
@@ -73,8 +76,5 @@
         app:itemIconSize="30dp"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"/>
-
-    <include
-        layout="@layout/bs_class_edit_add"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
