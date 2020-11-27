@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bottom_nav_parents"
+        android:icon="@drawable/group"
+        android:title="@string/bottom_frag_parents"
+        android:enabled="true"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/bottom_nav_hidden"
+        android:enabled="false"
+        app:showAsAction="never"
+        android:title="" />
+
+    <item
+        android:id="@+id/bottom_nav_removed"
+        android:icon="@drawable/rubbish_bin"
+        android:title="@string/bottom_frag_removed_parents"
+        android:enabled="true"
+        app:showAsAction="always"/>
+
+</menu>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dept_college_list">
+        <item>CEIT - BSCE</item>
+        <item>CEIT - BSECE</item>
+        <item>CEIT - BSEE</item>
+        <item>CEIT - BSIT</item>
+        <item>CEIT - BSIS</item>
+        <item>CEIT - BSCS</item>
+
+        <item>CTE - BSED</item>
+        <item>CTE - BEED</item>
+        <item>CTE - BTTE</item>
+        <item>CTE - BPED</item>
+        <item>CTE - BTVTED</item>
+
+        <item>COT - BMET-MIT</item>
+        <item>COT - BAET</item>
+        <item>COT - BEET</item>
+        <item>COT - BARET</item>
+        <item>COT - BEXET</item>
+        <item>COT - BSHM</item>
+        <item>COT - BSTM</item>
+        <item>COT - BSIT-ADT</item>
+        <item>COT - BSIT-ELXT</item>
+
+        <item>CAS - AB-EL</item>
+        <item>CAS - AB-ELL</item>
+        <item>CAS - BSES</item>
+        <item>CAS - BSMATH</item>
+    </string-array>
+    <string-array name="empty_teacher">
+        <item>No teacher available</item>
+    </string-array>
+</resources>
