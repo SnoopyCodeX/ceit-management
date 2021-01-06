@@ -49,8 +49,6 @@ import com.ceit.management.view.CurvedBottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.shape.CornerFamily;
-import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.jetbrains.annotations.NotNull;
@@ -373,6 +371,7 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
         Button close = root.findViewById(R.id.e_close);
 
         TextView birthday = root.findViewById(R.id.e_birthdate);
+        birthday.setVisibility(View.GONE);
         Spinner gender = root.findViewById(R.id.e_gender);
 
         TextInputEditText name = root.findViewById(R.id.e_name);
@@ -469,6 +468,8 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
         Button close = root.findViewById(R.id.e_close);
 
         TextView birthday = root.findViewById(R.id.e_birthdate);
+        birthday.setVisibility(View.GONE);
+
         Spinner gender = root.findViewById(R.id.e_gender);
 
         TextInputEditText name = root.findViewById(R.id.e_name);
@@ -571,13 +572,11 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                 String str_address = address.getText().toString();
                 String str_rank = rank.getText().toString();
 
-                String str_bday = birthday.getText().toString();
+                String str_bday = "Jan 8, 1999";
                 String str_gender = gender.getSelectedItem().toString();
 
                 if(str_name.isEmpty() || !str_name.matches("([a-zA-Z\\.\\s]+)$") || !(str_name.length() >= 4))
                     DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid name", "Okay", false);
-                else if(str_bday.toLowerCase().equals("birth date"))
-                    DialogUtil.errorDialog(getContext(), "Error", "Please set a valid birth date", "Okay", false);
                 else if(str_religion.isEmpty() || !str_religion.matches("([a-zA-Z\\-\\s]+)$") || !(str_religion.length() >= 4))
                     DialogUtil.errorDialog(getContext(), "Error", "Please add a valid religion", "Okay", false);
                 else if(str_email.isEmpty() || !str_email.matches("([a-zA-Z0-9\\-\\_\\.\\@]+)$"))
@@ -648,6 +647,8 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
         Button close = root.findViewById(R.id.e_close);
 
         TextView birthday = root.findViewById(R.id.e_birthdate);
+        birthday.setVisibility(View.GONE);
+
         Spinner gender = root.findViewById(R.id.e_gender);
 
         TextInputEditText name = root.findViewById(R.id.e_name);
@@ -733,15 +734,13 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                 String str_address = address.getText().toString();
                 String str_rank = rank.getText().toString();
 
-                String str_bday = birthday.getText().toString();
+                String str_bday = "Jan 8, 1999";
                 String str_gender = gender.getSelectedItem().toString();
 
                 if(base64Image == null)
                     DialogUtil.errorDialog(getContext(), "Error", "Please add an image", "Okay", false);
                 else if(str_name.isEmpty() || !str_name.matches("([a-zA-Z\\.\\s]+)$") || !(str_name.length() >= 4))
                     DialogUtil.errorDialog(getContext(), "Error", "Please enter a valid name", "Okay", false);
-                else if(str_bday.toLowerCase().equals("birth date"))
-                    DialogUtil.errorDialog(getContext(), "Error", "Please set a valid birth date", "Okay", false);
                 else if(str_religion.isEmpty() || !str_religion.matches("([a-zA-Z\\-\\s]+)$") || !(str_religion.length() >= 4))
                     DialogUtil.errorDialog(getContext(), "Error", "Please add a valid religion", "Okay", false);
                 else if(str_email.isEmpty() || !str_email.matches("([a-zA-Z0-9\\-\\_\\.\\@]+)$"))
