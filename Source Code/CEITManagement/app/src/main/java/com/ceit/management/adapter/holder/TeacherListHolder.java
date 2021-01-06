@@ -127,6 +127,7 @@ public class TeacherListHolder extends BaseViewHolder
                                     DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", "Server returned an unexpected result");
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
 
                             @Override
@@ -134,6 +135,7 @@ public class TeacherListHolder extends BaseViewHolder
                                 DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", t.getMessage());
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
                         });
                     },
@@ -168,6 +170,7 @@ public class TeacherListHolder extends BaseViewHolder
                                     DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", "Server returned an unexpected result");
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
 
                             @Override
@@ -175,6 +178,7 @@ public class TeacherListHolder extends BaseViewHolder
                                 DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", t.getMessage());
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
                         });
                     },

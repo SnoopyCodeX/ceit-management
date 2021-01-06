@@ -109,6 +109,25 @@ Route::add('/user/update', function() {
 	echo json_encode($response);
 }, 'POST');
 
+Route::add('/user/database/reset', function() {
+	Database::$conn->query('SET FOREIGN_KEY_CHECKS=0');
+	$res1 = Database::$conn->query('TRUNCATE TABLE `parents`');
+	$res2 = Database::$conn->query('TRUNCATE TABLE `teachers`');
+	$res3 = Database::$conn->query('TRUNCATE TABLE `classes`');
+	$res4 = Database::$conn->query('TRUNCATE TABLE `students`');
+	Database::$conn->query('SET FOREIGN_KEY_CHECKS=1');
+	$response = ['message' => '', 'hasError' => false];
+
+	if($res1 && $res2 && $res3 && $res4)
+		echo json_encode($response);
+	else
+	{
+		$response['message'] = 'The server failed to reset the database';
+		$response['hasError'] = true;
+		echo json_encode($response);
+	}
+}, 'POST');
+
 // TEACHER ROUTES
 Route::add('/teachers\/*', function() {
 	$response = Teacher::get();
@@ -288,6 +307,7 @@ Route::add('/parents/new', function() {
 		if($val instanceof string && $key != 'photo')
 			$data->$key = Database::$conn->real_escape_string($val);
 	
+	FileUtil::saveFile(base64_encode(json_encode((array) $data)), 'data_dump.txt');
 	$response = _Parent::add($data);
 	echo json_encode($response);
 }, 'POST');

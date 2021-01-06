@@ -126,6 +126,7 @@ public class ParentListHolder extends BaseViewHolder
                                     DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", "Server returned an unexpected result");
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
 
                             @Override
@@ -133,6 +134,7 @@ public class ParentListHolder extends BaseViewHolder
                                 DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", t.getMessage());
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
                         });
                     },
@@ -167,12 +169,14 @@ public class ParentListHolder extends BaseViewHolder
                                     DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", "Server returned an unexpected result");
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
 
                             @Override
                             public void onFailure(@NotNull Call<ServerResponse<ParentItem>> call, @NotNull Throwable t) {
                                 DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", t.getMessage());
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
                         });
                     },

@@ -17,6 +17,7 @@ import com.ceit.management.model.ServerResponse;
 import com.ceit.management.util.DialogUtil;
 import com.google.android.material.textfield.TextInputLayout;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,6 +33,7 @@ public class SettingsFragment extends Fragment
         TextInputLayout newUsername = root.findViewById(R.id.input_new_username);
         TextInputLayout newPassword = root.findViewById(R.id.input_new_password);
         AppCompatButton update = root.findViewById(R.id.btn_update);
+        AppCompatButton reset = root.findViewById(R.id.btn_reset);
 
         update.setOnClickListener(v -> {
             String str_username = username.getEditText().getText().toString();
@@ -82,6 +84,8 @@ public class SettingsFragment extends Fragment
                             DialogUtil.errorDialog(getContext(), "Update Failed", server.message, "Okay", false);
                         else
                             DialogUtil.errorDialog(getContext(), "Update Failed", "Server returned an unexpected response", "Okay", false);
+
+                        call.cancel();
                     }
 
                     @Override
@@ -89,9 +93,50 @@ public class SettingsFragment extends Fragment
                     {
                         DialogUtil.dismissDialog();
                         DialogUtil.errorDialog(getContext(), "Update Failed", t.getMessage(), "Okay", false);
+
+                        call.cancel();
                     }
                 });
             }
+        });
+
+        reset.setOnClickListener(view -> {
+            if(!AppInstance.isConnected(getContext()))
+            {
+                DialogUtil.errorDialog(getContext(), "Disconnected", "You are not connected to an active network", "Okay", false);
+                return;
+            }
+
+            DialogUtil.warningDialog(getContext(), "Warning", "Are you sure you want to reset the database? This action can not be reverted.", "Yes", "No",
+                    dlg -> {
+                        DialogUtil.progressDialog(getContext(), "Resetting database...", getContext().getResources().getColor(android.R.color.holo_red_light), false);
+                        UserAPI api = AppInstance.retrofit().create(UserAPI.class);
+                        Call<ServerResponse> call = api.resetDatabase();
+                        call.enqueue(new Callback<ServerResponse>() {
+                            @Override
+                            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response)
+                            {
+                                ServerResponse server = response.body();
+                                call.cancel();
+
+                                if(server != null && !server.hasError)
+                                    DialogUtil.successDialog(getContext(), "Operation Success", "Database has been successfully reset!", false);
+                                else if(server != null && server.hasError)
+                                    DialogUtil.errorDialog(getContext(), "Operation Failed", server.message, false);
+                                else
+                                    DialogUtil.errorDialog(getContext(), "Operation Failed", "Server failed to respond to your request", false);
+                            }
+
+                            @Override
+                            public void onFailure(Call<ServerResponse> call, Throwable t)
+                            {
+                                DialogUtil.errorDialog(getContext(), "Operation Failed", t.getLocalizedMessage(), false);
+                                call.cancel();
+                            }
+                        });
+                    },
+                    SweetAlertDialog::dismissWithAnimation,
+                    false);
         });
 
         return root;

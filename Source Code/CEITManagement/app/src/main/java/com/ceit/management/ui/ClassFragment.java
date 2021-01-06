@@ -266,6 +266,8 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                 }
                 else
                     noDataFound();
+
+                call.cancel();
             }
 
             @Override
@@ -273,6 +275,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
             {
                 refreshClassListLayout.setRefreshing(false);
                 serverError();
+                call.cancel();
             }
         });
     }
@@ -312,6 +315,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                 }
                 else
                     noDataFound();
+                call.cancel();
             }
 
             @Override
@@ -319,6 +323,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
             {
                 refreshClassListLayout.setRefreshing(false);
                 serverError();
+                call.cancel();
             }
         });
     }
@@ -379,6 +384,8 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                             DialogUtil.errorDialog(getContext(), "Failed", server.message, "Okay", false);
                         else
                             DialogUtil.errorDialog(getContext(), "Failed", "Server returned an unexpected result", "Okay", false);
+
+                        call.cancel();
                     }
 
                     @Override
@@ -386,6 +393,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                     {
                         DialogUtil.dismissDialog();
                         DialogUtil.errorDialog(getContext(), "Failed", t.getMessage(), "Okay", false);
+                        call.cancel();
                     }
                 });
             }
@@ -438,6 +446,8 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                     teacherSpinner.setAdapter(adapter);
                     teacherSpinner.setSelection(selection);
                 }
+
+                call.cancel();
             }
 
             @Override
@@ -445,6 +455,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
             {
                 DialogUtil.dismissDialog();
                 DialogUtil.errorDialog(getContext(), "Preparation Failed", t.getMessage(), "Okay", false);
+                call.cancel();
             }
         });
     }
@@ -510,11 +521,14 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                             DialogUtil.errorDialog(getContext(), "Update Failed", server.message, "Okay", false);
                         else
                             DialogUtil.errorDialog(getContext(), "Update Failed", "Server returned an unexpected result", "Okay", false);
+
+                        call.cancel();
                     }
 
                     @Override
                     public void onFailure(Call<ServerResponse<ClassItem>> call, Throwable t) {
                         DialogUtil.errorDialog(getContext(), "Update Failed", t.getMessage(), "Okay", false);
+                        call.cancel();
                     }
                 });
             }
@@ -634,12 +648,15 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                             else
                                 DialogUtil.errorDialog(context, "Error", server.message, "Okay", false);
                         }
+
+                        call.cancel();
                     }
 
                     @Override
                     public void onFailure(Call<ServerResponse<ClassItem>> call, Throwable t)
                     {
                         DialogUtil.errorDialog(context, "Server Error", t.getMessage(), false);
+                        call.cancel();
                     }
                 });
             }

@@ -144,6 +144,7 @@ public class LoginActivity extends AppCompatActivity implements OnInternetConnec
             {
                 DialogUtil.dismissDialog();
                 ServerResponse model = response.body();
+                call.cancel();
 
                 if(model != null)
                 {
@@ -180,6 +181,7 @@ public class LoginActivity extends AppCompatActivity implements OnInternetConnec
                 DialogUtil.dismissDialog();
                 DialogUtil.errorDialog(LoginActivity.this, "Login Failed", t.getMessage(), "Okay", false);
                 Log.e(LoginActivity.class.getSimpleName(), t.getMessage());
+                call.cancel();
             }
         });
     }

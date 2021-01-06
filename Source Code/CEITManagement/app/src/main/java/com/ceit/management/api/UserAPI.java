@@ -18,4 +18,7 @@ public interface UserAPI
 
     @POST("user/update")
     Call<ServerResponse> update(@Body UpdateCredentials credentials);
+
+    @POST("user/database/reset")
+    Call<ServerResponse> resetDatabase();
 }

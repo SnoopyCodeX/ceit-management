@@ -311,6 +311,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                     noDataFound();
 
                 refreshParentListLayout.setRefreshing(false);
+                call.cancel();
             }
 
             @Override
@@ -318,6 +319,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
             {
                 refreshParentListLayout.setRefreshing(false);
                 serverError();
+                call.cancel();
             }
         });
     }
@@ -359,6 +361,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                     noDataFound();
 
                 refreshParentListLayout.setRefreshing(false);
+                call.cancel();
             }
 
             @Override
@@ -366,6 +369,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
             {
                 refreshParentListLayout.setRefreshing(false);
                 serverError();
+                call.cancel();
             }
         });
     }
@@ -381,6 +385,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
             {
                 ServerResponse<StudentItem> server = response.body();
                 DialogUtil.dismissDialog();
+                call.cancel();
 
                 if(server != null && !server.hasError)
                 {
@@ -423,6 +428,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
             public void onFailure(Call<ServerResponse<StudentItem>> call, Throwable t)
             {
                 DialogUtil.errorDialog(getContext(), "Preparing Failed", t.getMessage(), "Okay", false);
+                call.cancel();
             }
         });
     }
@@ -605,6 +611,8 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                                 DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
                             else
                                 DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+
+                            call.cancel();
                         }
 
                         @Override
@@ -612,6 +620,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                         {
                             DialogUtil.dismissDialog();
                             DialogUtil.errorDialog(getContext(), "Error", t.getMessage(), "Okay", false);
+                            call.cancel();
                         }
                     });
                 }
@@ -963,6 +972,8 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                                 DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
                             else
                                 DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+
+                            call.cancel();
                         }
 
                         @Override
@@ -970,6 +981,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                         {
                             DialogUtil.dismissDialog();
                             DialogUtil.errorDialog(getContext(), "Error", t.getLocalizedMessage(), "Okay", false);
+                            call.cancel();
                         }
                     });
                 }
@@ -1054,6 +1066,8 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                             DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
                         else
                             DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+
+                        call.cancel();
                     }
 
                     @Override
@@ -1061,6 +1075,7 @@ public class ParentsFragment extends Fragment implements WaveSwipeRefreshLayout.
                     {
                         DialogUtil.dismissDialog();
                         DialogUtil.errorDialog(getContext(), "Error", t.getMessage(), "Okay", false);
+                        call.cancel();
                     }
                 });
             }

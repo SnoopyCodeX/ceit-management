@@ -247,7 +247,7 @@ class _Parent {
 	
 	public static function add(object $data)
 	{
-		$query = "SELECT * FROM " .self::$table . " WHERE name='" . $data->name . "'";
+		$query = "SELECT * FROM " . self::$table . " WHERE name='" . $data->name . "' AND deleted='0'";
 		$res = self::$conn->query($query);
 		
 		if($res->num_rows == 0)
@@ -264,14 +264,20 @@ class _Parent {
 			$data->birthday = $date;
 			
 			foreach($data as $key => $val)
-				if($key != 'child' && $key != 'photo')
+				if($key != "child" && $key != "photo" && $key != "removedChild")
 					$query .= "$key, ";
+				else
+					continue;
+
 			$query = substr($query, 0, strlen($query) - 2);
 			$query .= ") VALUES(";
 			
 			foreach($data as $key => $val)
-				if($key != 'child' && $key != 'photo')
+				if($key != "child" && $key != "photo" && $key != "removedChild")
 					$query .= "'$val', ";
+				else
+					continue;
+			
 			$query = substr($query, 0, strlen($query) - 2);
 			$query .= ")";
 			

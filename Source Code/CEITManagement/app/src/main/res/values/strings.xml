@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">CEIT Management</string>
+    <string name="app_name">CEIT Directory Management</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">CEIT Management</string>
+    <string name="nav_header_title">CEIT Directory Management</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="hint_username">Admin Username</string>
     <string name="hint_password">Admin Password</string>
@@ -86,4 +86,6 @@
     <string name="hint_old_admin_password">Old Admin Password</string>
     <string name="hint_new_admin_password">New Admin Password</string>
     <string name="hint_new_admin_username">New Admin Username</string>
+    <string name="btn_reset">Reset Database</string>
+    <string name="text_header_danger_zone">Danger Zone</string>
 </resources>

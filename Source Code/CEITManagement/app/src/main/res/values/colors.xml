@@ -15,4 +15,10 @@
 
     <color name="positiveColorDefault">#5ED504</color>
     <color name="negativeColorDefault">#FF0000</color>
+
+    <color name="main_disabled_color">#838383</color>
+    <color name="main_disabled_stroke_color">#707070</color>
+
+    <color name="main_green_color">#6bd505</color>
+    <color name="main_green_stroke_color">#60bf04</color>
 </resources>

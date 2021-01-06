@@ -296,9 +296,13 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                     }
                     else
                         noDataFound();
+
+
                 }
                 else
                     noDataFound();
+
+                call.cancel();
             }
 
             @Override
@@ -306,6 +310,7 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
             {
                 refreshTeacherListLayout.setRefreshing(false);
                 serverError();
+                call.cancel();
             }
         });
     }
@@ -345,6 +350,8 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                 }
                 else
                     noDataFound();
+
+                call.cancel();
             }
 
             @Override
@@ -352,6 +359,7 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
             {
                 refreshTeacherListLayout.setRefreshing(false);
                 serverError();
+                call.cancel();
             }
         });
     }
@@ -610,6 +618,8 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                                 DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
                             else
                                 DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+
+                            call.cancel();
                         }
 
                         @Override
@@ -617,6 +627,7 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                         {
                             DialogUtil.dismissDialog();
                             DialogUtil.errorDialog(getContext(), "Error", t.getMessage(), "Okay", false);
+                            call.cancel();
                         }
                     });
                 }
@@ -771,6 +782,8 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                                 DialogUtil.errorDialog(getContext(), "Error", server.message, "Okay", false);
                             else
                                 DialogUtil.errorDialog(getContext(), "Error", "Server returned an unexpected result", "Okay", false);
+
+                            call.cancel();
                         }
 
                         @Override
@@ -778,6 +791,7 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                         {
                             DialogUtil.dismissDialog();
                             DialogUtil.errorDialog(getContext(), "Error", t.getMessage(), "Okay", false);
+                            call.cancel();
                         }
                     });
                 }
@@ -827,6 +841,8 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                                 viewTeacher(studentItems.get(0));
                             else
                                 DialogUtil.errorDialog(context, "Error", server.message, "Okay", false);
+
+                            call.cancel();
                         }
                     }
 
@@ -835,6 +851,7 @@ public class TeachersFragment extends Fragment implements WaveSwipeRefreshLayout
                     {
                         DialogUtil.errorDialog(context, "Server Error", t.getMessage(), false);
                         refreshTeacherListLayout.setRefreshing(false);
+                        call.cancel();
                     }
                 });
             }

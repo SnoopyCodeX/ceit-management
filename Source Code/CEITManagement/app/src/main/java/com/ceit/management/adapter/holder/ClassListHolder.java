@@ -110,12 +110,13 @@ public class ClassListHolder extends BaseViewHolder
                                     DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", "Server returned an unexpected result");
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
 
                             @Override
                             public void onFailure(@NotNull Call<ServerResponse<ClassItem>> call, @NotNull Throwable t) {
                                 DialogUtil.errorDialog(itemView.getContext(), "Restore Failed", t.getMessage());
-
+                                call.cancel();
                                 swipeRevealLayout.close(true);
                             }
                         });
@@ -151,6 +152,7 @@ public class ClassListHolder extends BaseViewHolder
                                     DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", "Server returned an unexpected result");
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
 
                             @Override
@@ -158,6 +160,7 @@ public class ClassListHolder extends BaseViewHolder
                                 DialogUtil.errorDialog(itemView.getContext(), "Delete Failed", t.getMessage());
 
                                 swipeRevealLayout.close(true);
+                                call.cancel();
                             }
                         });
                     },
