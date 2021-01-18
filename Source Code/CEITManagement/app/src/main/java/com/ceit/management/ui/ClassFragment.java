@@ -249,6 +249,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
             {
                 ServerResponse<ClassItem> server = response.body();
                 refreshClassListLayout.setRefreshing(false);
+                call.cancel();
 
                 if(server != null)
                 {
@@ -266,8 +267,6 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                 }
                 else
                     noDataFound();
-
-                call.cancel();
             }
 
             @Override
@@ -298,6 +297,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
             {
                 ServerResponse<ClassItem> server = response.body();
                 refreshClassListLayout.setRefreshing(false);
+                call.cancel();
 
                 if(server != null)
                 {
@@ -315,7 +315,6 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                 }
                 else
                     noDataFound();
-                call.cancel();
             }
 
             @Override
@@ -349,6 +348,8 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
         curvedBottomNavigationView.setVisibility(View.GONE);
         fabAdd.setVisibility(View.GONE);
 
+        add.setText("Add Class");
+
         // Fetch all available teachers and populate the teacher spinner
         fetchTeachers("");
 
@@ -370,6 +371,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                     {
                         ServerResponse<ClassItem> server = response.body();
                         DialogUtil.dismissDialog();
+                        call.cancel();
 
                         if(server != null && !server.hasError)
                         {
@@ -384,8 +386,6 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                             DialogUtil.errorDialog(getContext(), "Failed", server.message, "Okay", false);
                         else
                             DialogUtil.errorDialog(getContext(), "Failed", "Server returned an unexpected result", "Okay", false);
-
-                        call.cancel();
                     }
 
                     @Override
@@ -429,6 +429,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                 DialogUtil.dismissDialog();
                 AppCompatSpinner teacherSpinner = root.findViewById(R.id.input_class_teacher);
                 ServerResponse<TeacherItem> server = response.body();
+                call.cancel();
 
                 if(server != null && !server.hasError)
                 {
@@ -446,8 +447,6 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                     teacherSpinner.setAdapter(adapter);
                     teacherSpinner.setSelection(selection);
                 }
-
-                call.cancel();
             }
 
             @Override
@@ -462,7 +461,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
 
     private void editClass(ClassItem item)
     {
-        String[] departments = getContext().getResources().getStringArray(R.array.dept_college_list);
+        String[] departments = getContext().getResources().getStringArray(R.array.grade_levels);
         ArrayAdapter<String> deptAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, departments);
         TextInputLayout name = root.findViewById(R.id.input_classname);
         AppCompatSpinner dept = root.findViewById(R.id.input_class_dept);
@@ -511,6 +510,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                     public void onResponse(Call<ServerResponse<ClassItem>> call, Response<ServerResponse<ClassItem>> response)
                     {
                         ServerResponse<ClassItem> server = response.body();
+                        call.cancel();
 
                         if(server != null && !server.hasError) {
                             DialogUtil.successDialog(getContext(), "Update Successful", server.message, "Okay", false);
@@ -521,8 +521,6 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                             DialogUtil.errorDialog(getContext(), "Update Failed", server.message, "Okay", false);
                         else
                             DialogUtil.errorDialog(getContext(), "Update Failed", "Server returned an unexpected result", "Okay", false);
-
-                        call.cancel();
                     }
 
                     @Override
@@ -638,6 +636,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                     {
                         DialogUtil.dismissDialog();
                         ServerResponse<ClassItem> server = response.body();
+                        call.cancel();
 
                         if(server != null && !server.hasError)
                         {
@@ -648,8 +647,6 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
                             else
                                 DialogUtil.errorDialog(context, "Error", server.message, "Okay", false);
                         }
-
-                        call.cancel();
                     }
 
                     @Override

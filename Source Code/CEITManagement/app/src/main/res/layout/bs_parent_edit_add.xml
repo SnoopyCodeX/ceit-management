@@ -484,7 +484,7 @@
                         android:textAppearance="?android:textAppearanceSmall"
                         android:hint="@string/hint_enter_child_s_name"
                         android:background="@android:color/transparent"
-                        android:dropDownAnchor="@id/header_occupation"/>
+                        android:dropDownAnchor="@id/e_name"/>
 
                     <ImageView
                         android:id="@+id/icon_child"

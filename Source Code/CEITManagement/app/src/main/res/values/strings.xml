@@ -54,7 +54,7 @@
     <string name="header_email">Email</string>
     <string name="header_contact_number">Contact Number</string>
     <string name="header_address">Address</string>
-    <string name="header_section">Section</string>
+    <string name="header_section">Grade Level</string>
     <string name="header_religion">Religion</string>
     <string name="btn_save_profile">Save Profile</string>
     <string name="btn_cancel_edit">Cancel Edit</string>

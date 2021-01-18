@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment;
 import com.ceit.management.R;
 import com.ceit.management.util.Constants;
 
+import java.util.Objects;
+
 public class DashboardFragment extends Fragment implements View.OnClickListener
 {
     private CardView gridClass, gridTeachers, gridStudents, gridParents;
@@ -62,7 +64,7 @@ public class DashboardFragment extends Fragment implements View.OnClickListener
     {
         Intent data = new Intent(Constants.TRIGGER_FRAGMENT_NAVIGATION);
         data.putExtra(Constants.KEY_TRIGGER_FRAGMENT_NAVIGATE, fragmentId);
-        getContext().sendBroadcast(data);
+        requireContext().sendBroadcast(data);
     }
 }
 

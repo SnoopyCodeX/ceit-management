@@ -51,8 +51,6 @@ import com.ceit.management.view.CurvedBottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.shape.CornerFamily;
-import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.jetbrains.annotations.NotNull;
@@ -347,7 +345,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
                     {
                         if(items.get(i).name.toLowerCase().equals(selectedClass.toLowerCase()))
                             defIndex = i;
-                        names[i] = items.get(i).name;
+                        names[i] = items.get(i).department;
                     }
 
                     ArrayAdapter<String> classAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
@@ -370,7 +368,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
                     {
                         if(fallbackItem.get(i).name.toLowerCase().equals(selectedClass.toLowerCase()))
                             defIndex = i;
-                        names[i] = fallbackItem.get(i).name;
+                        names[i] = fallbackItem.get(i).department;
                     }
 
                     ArrayAdapter<String> classAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);
@@ -384,6 +382,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
             @Override
             public void onFailure(Call<ServerResponse<ClassItem>> call, Throwable t)
             {
+                DialogUtil.dismissDialog();
                 List<ClassItem> fallbackItem = new ArrayList<>();
                 ClassItem classItem = ClassItem.newClass();
                 classItem.name = "No classes available";
@@ -397,7 +396,7 @@ public class StudentsFragment extends Fragment implements WaveSwipeRefreshLayout
                 {
                     if(fallbackItem.get(i).name.toLowerCase().equals(selectedClass.toLowerCase()))
                         defIndex = i;
-                    names[i] = fallbackItem.get(i).name;
+                    names[i] = fallbackItem.get(i).department;
                 }
 
                 ArrayAdapter<String> classAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, names);

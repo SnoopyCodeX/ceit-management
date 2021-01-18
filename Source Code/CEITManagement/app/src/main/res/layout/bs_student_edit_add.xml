@@ -123,101 +123,116 @@
             android:layout_weight="1"
             android:scrollbars="none">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="18dp">
-
-                <TextView
-                    android:id="@+id/header_birthday"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_birth_date"
-                    android:textStyle="bold"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:textColor="#A0AAAF"
-                    android:fontFamily="@font/roboto_regular"/>
-
-                <TextView
-                    android:id="@+id/header_gender"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/header_gender"
-                    android:textStyle="bold"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:textColor="#A0AAAF"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="110dp"
-                    android:fontFamily="@font/roboto_regular"
-                    tools:ignore="RelativeOverlap" />
+                android:padding="18dp"
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/upper_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/header_birthday"
-                    android:baselineAligned="false">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="20dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:background="@drawable/input_underline"
-                        android:padding="14dp">
+                        android:weightSum="1"
+                        android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/e_birthdate"
-                            android:layout_width="0dp"
+                            android:id="@+id/header_birthday"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:textColor="@color/black"
-                            android:hint="@string/hint_birth_date"
-                            android:inputType="date"
-                            tools:ignore="NestedWeights,TextViewEdits" />
+                            android:layout_weight=".5"
+                            android:text="@string/header_birth_date"
+                            android:textStyle="bold"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:textColor="#A0AAAF"
+                            android:fontFamily="@font/roboto_regular"/>
 
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/calendar"
-                            app:tint="#5E676C"
-                            android:contentDescription="@string/desc_icon" />
+                        <TextView
+                            android:id="@+id/header_gender"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight=".5"
+                            android:text="@string/header_gender"
+                            android:textStyle="bold"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:textColor="#A0AAAF"
+                            android:fontFamily="@font/roboto_regular"
+                            tools:ignore="RelativeOverlap" />
 
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/upper_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
                         android:orientation="horizontal"
-                        android:background="@drawable/input_underline"
-                        android:padding="14.6dp">
+                        android:baselineAligned="false">
 
-                        <Spinner
-
-                            android:id="@+id/e_gender"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="20dp"
                             android:layout_weight="1"
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:textColor="@color/black"
-                            tools:ignore="NestedWeights" />
+                            android:orientation="horizontal"
+                            android:background="@drawable/input_underline"
+                            android:padding="14dp">
 
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_gravity="center_vertical"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/genders"
-                            app:tint="#87939A"
-                            android:contentDescription="@string/desc_icon" />
+                            <TextView
+                                android:id="@+id/e_birthdate"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textAppearance="?android:textAppearanceSmall"
+                                android:textColor="@color/black"
+                                android:hint="@string/hint_birth_date"
+                                android:inputType="date"
+                                tools:ignore="NestedWeights,TextViewEdits" />
+
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_gravity="center_vertical"
+                                android:src="@drawable/calendar"
+                                app:tint="#5E676C"
+                                android:contentDescription="@string/desc_icon" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:background="@drawable/input_underline"
+                            android:padding="14.6dp">
+
+                            <Spinner
+
+                                android:id="@+id/e_gender"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:textAppearance="?android:textAppearanceSmall"
+                                android:textColor="@color/black"
+                                tools:ignore="NestedWeights" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_gravity="center_vertical"
+                                android:scaleType="fitXY"
+                                android:src="@drawable/genders"
+                                app:tint="#87939A"
+                                android:contentDescription="@string/desc_icon" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -227,7 +242,6 @@
                     android:id="@+id/header_religion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/upper_info"
                     android:layout_marginTop="30dp"
                     android:text="@string/header_religion"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -239,7 +253,6 @@
                     android:id="@+id/c_religion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/header_religion"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
@@ -272,7 +285,6 @@
                     android:id="@+id/header_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/c_religion"
                     android:layout_marginTop="30dp"
                     android:text="@string/header_email"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -284,7 +296,6 @@
                     android:id="@+id/c_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/header_email"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
@@ -317,7 +328,6 @@
                     android:id="@+id/header_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/c_email"
                     android:layout_marginTop="30dp"
                     android:text="@string/header_contact_number"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -329,7 +339,6 @@
                     android:id="@+id/c_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/header_number"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
@@ -362,7 +371,6 @@
                     android:id="@+id/header_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/c_number"
                     android:layout_marginTop="30dp"
                     android:text="@string/header_address"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -374,7 +382,6 @@
                     android:id="@+id/c_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/header_address"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
@@ -407,7 +414,6 @@
                     android:id="@+id/header_section"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/c_address"
                     android:layout_marginTop="30dp"
                     android:text="@string/header_section"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -419,7 +425,6 @@
                     android:id="@+id/c_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/header_section"
                     android:orientation="horizontal"
                     android:background="@drawable/input_underline"
                     android:padding="14dp">
@@ -445,7 +450,7 @@
 
                 </LinearLayout>
 
-            </RelativeLayout>
+            </LinearLayout>
 
         </ScrollView>
 

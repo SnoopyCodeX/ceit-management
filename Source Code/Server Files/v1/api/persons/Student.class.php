@@ -39,7 +39,7 @@ class Student {
 					if($query && $query->num_rows > 0)
 					{
 						$class = $query->fetch_assoc();
-						$section = $class['name'];
+						$section = $class['department'];
 						$row['section'] = $section;
 					}
 					else
@@ -90,7 +90,7 @@ class Student {
 				if($query && $query->num_rows > 0)
 				{
 					$class = $query->fetch_assoc();
-					$name = $class['name'];
+					$name = $class['department'];
 					$row['section'] = $name;
 				}
 				else
@@ -123,7 +123,7 @@ class Student {
 			if(count(Section::get()->data) <= 0)
 			{
 				self::$response->hasError = true;
-				self::$response->message = 'Please create a section first before updating a student';
+				self::$response->message = 'Please create a class first before updating a student';
 				return self::$response;
 			}
 
@@ -159,7 +159,7 @@ class Student {
 
 			if(isset($data->section))
 			{
-				$query = "SELECT * FROM classes WHERE name='" . $data->section . "'";
+				$query = "SELECT * FROM classes WHERE department='" . $data->section . "'";
 				$res = self::$conn->query($query);
 
 				if($res && $res->num_rows > 0)
@@ -254,7 +254,7 @@ class Student {
 		if(count(Section::get()->data) <= 0)
 		{
 			self::$response->hasError = true;
-			self::$response->message = 'Please create a section first before adding in a student';
+			self::$response->message = 'Please create a class first before adding in a student';
 			return self::$response;
 		}
 
@@ -272,7 +272,7 @@ class Student {
 			$date = $date->format('Y-m-d');
 			$data->birthday = $date;
 
-			$query = "SELECT * FROM classes WHERE name='" . $data->section . "'";
+			$query = "SELECT * FROM classes WHERE department='" . $data->section . "'";
 			$res = self::$conn->query($query);
 
 			if($res && $res->num_rows > 0)
@@ -283,7 +283,7 @@ class Student {
 			else
 			{
 				self::$response->hasError = true;
-				self::$response->message = $res ? 'Please create a section first before adding in a student' : self::$conn->error;
+				self::$response->message = $res ? 'Please create a class first before adding in a student' : self::$conn->error;
 				return self::$response;
 			}
 
