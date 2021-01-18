@@ -134,7 +134,8 @@
                     android:textStyle="bold"
                     android:textAppearance="?android:textAppearanceMedium"
                     android:textColor="#A0AAAF"
-                    android:fontFamily="@font/roboto_regular"/>
+                    android:fontFamily="@font/roboto_regular"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/header_gender"
@@ -144,7 +145,7 @@
                     android:textStyle="bold"
                     android:textAppearance="?android:textAppearanceMedium"
                     android:textColor="#A0AAAF"
-                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentEnd="false"
                     android:layout_marginEnd="110dp"
                     android:fontFamily="@font/roboto_regular"
                     tools:ignore="RelativeOverlap" />
@@ -154,7 +155,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_below="@id/header_birthday"
+                    android:layout_below="@id/header_gender"
                     android:baselineAligned="false">
 
                     <LinearLayout
@@ -164,7 +165,8 @@
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:background="@drawable/input_underline"
-                        android:padding="14dp">
+                        android:padding="14dp"
+                        android:visibility="gone">
 
                         <TextView
                             android:id="@+id/e_birthdate"
@@ -191,7 +193,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="0dp"
                         android:layout_weight="1"
                         android:orientation="horizontal"
                         android:background="@drawable/input_underline"

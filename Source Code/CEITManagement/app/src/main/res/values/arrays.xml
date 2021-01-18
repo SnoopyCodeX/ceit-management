@@ -32,4 +32,12 @@
     <string-array name="empty_teacher">
         <item>No teacher available</item>
     </string-array>
+    <string-array name="grade_levels">
+        <item>Grade 7</item>
+        <item>Grade 8</item>
+        <item>Grade 9</item>
+        <item>Grade 10</item>
+        <item>Grade 11</item>
+        <item>Grade 12</item>
+    </string-array>
 </resources>

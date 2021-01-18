@@ -483,7 +483,8 @@
                         android:imeOptions="actionDone"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:hint="@string/hint_enter_child_s_name"
-                        android:background="@android:color/transparent"/>
+                        android:background="@android:color/transparent"
+                        android:dropDownAnchor="@id/header_occupation"/>
 
                     <ImageView
                         android:id="@+id/icon_child"

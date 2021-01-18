@@ -88,4 +88,5 @@
     <string name="hint_new_admin_username">New Admin Username</string>
     <string name="btn_reset">Reset Database</string>
     <string name="text_header_danger_zone">Danger Zone</string>
+    <string name="input_subject_name">Subject</string>
 </resources>
