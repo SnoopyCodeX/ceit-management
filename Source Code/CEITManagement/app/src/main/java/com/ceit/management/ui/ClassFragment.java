@@ -330,7 +330,7 @@ public class ClassFragment extends Fragment implements WaveSwipeRefreshLayout.On
 
     private void showAddClass()
     {
-        ArrayAdapter<String> deptAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getContext().getResources().getStringArray(R.array.dept_college_list));
+        ArrayAdapter<String> deptAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, getContext().getResources().getStringArray(R.array.grade_levels));
         TextInputLayout name = root.findViewById(R.id.input_classname);
         AppCompatSpinner dept = root.findViewById(R.id.input_class_dept);
         AppCompatSpinner tea = root.findViewById(R.id.input_class_teacher);
